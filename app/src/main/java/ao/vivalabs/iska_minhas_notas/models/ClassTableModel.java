@@ -101,6 +101,26 @@ public class ClassTableModel implements Comparable<ClassTableModel> {
         return melhoria;
     }
 
+    public String[] toArray() {
+        return new String[]{
+                this.disciplina,
+                this.abreviatura,
+                this.ano,
+                this.turma,
+                this.tipo,
+                this.notaFinal,
+                this.avaliacaoContinua,
+                this.parcelar1,
+                this.parcelar2,
+                this.finalContinua,
+                this.resultado,
+                this.exame,
+                this.recurso,
+                this.epocaEspecial,
+                this.melhoria
+        };
+    }
+
     @Override
     public int compareTo(ClassTableModel otherClassTableModel) {
 

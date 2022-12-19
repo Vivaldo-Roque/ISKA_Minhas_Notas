@@ -25,18 +25,19 @@
             android:id="@+id/editTextTextMultiLine"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
             android:ems="10"
-            android:justificationMode="inter_word"
             android:gravity="start|top"
             android:inputType="none"
+            android:justificationMode="inter_word"
+            android:padding="15dp"
+            android:text="  Aplicação faz uso de web scraping, é uma solução para quem quer ter acesso a dados estruturados da web de uma forma automatizada. O web scraping pode ser bastante útil quando o site do qual se pretende obter dados não tem uma API ou, caso tenha, forneça apenas um acesso limitado aos dados. O web scraping é o processo de recolha de dados estruturados da web de uma forma automatizada. É também conhecido como web data extraction ou data scraping.\n\n A aplicação consegue extrair os dados mesmo estando contencioso no sistema. Isso significa que podes ver tuas notas mesmo estando contencioso.\n\n A aplicação consegue gerar dois ficheiros sendo um xlsx (Excel) e outro pdf, contendo suas notas de todos os anos em tabelas. Recomendo usar o ficheiro xlsx para impressão invés do pdf.\n\n A aplicação ainda encontra-se em fase de desenvolvimento, pode conter falhas!."
             android:textColor="@color/black"
             android:textSize="22sp"
-            android:padding="15dp"
-            android:text="  Aplicação faz uso de web scraping, é uma solução para quem quer ter acesso a dados estruturados da web de uma forma automatizada. O web scraping pode ser bastante útil quando o site do qual se pretende obter dados não tem uma API ou, caso tenha, forneça apenas um acesso limitado aos dados. O web scraping é o processo de recolha de dados estruturados da web de uma forma automatizada. É também conhecido como web data extraction ou data scraping.\n\n A aplicação ainda encontra-se em fase de desenvolvimento, pode conter falhas!."
-            android:layout_marginTop="25dp"
             app:layout_constraintEnd_toEndOf="@+id/textView6"
+            app:layout_constraintHorizontal_bias="0.502"
             app:layout_constraintStart_toStartOf="@+id/textView6"
-            app:layout_constraintTop_toBottomOf="@+id/textView6"/>
+            app:layout_constraintTop_toBottomOf="@+id/textView6" />
 
         <TextView
             android:id="@+id/textView7"

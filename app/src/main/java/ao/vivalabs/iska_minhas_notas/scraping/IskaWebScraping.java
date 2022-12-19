@@ -41,13 +41,20 @@ public class IskaWebScraping {
 
     public List<ClassTableModel> getTablesMapList() {
 
-        List<ClassTableModel> temp = new ArrayList<>();
+        List<ClassTableModel> tempPeriod;
+        List<ClassTableModel> res = new ArrayList<>();
+
+        String[] periods = {"1º Semestre", "2º Semestre", "Anual"};
 
         for (String year : findAllYears(tablesMapList)) {
-            temp.addAll(findAllByYear(year, tablesMapList));
+            for (String period : periods) {
+                tempPeriod = new ArrayList<>(findAllByPeriod(period, findAllByYear(year, tablesMapList)));
+                Collections.sort(tempPeriod);
+                res.addAll(tempPeriod);
+            }
         }
 
-        return temp;
+        return res;
     }
 
     public void SetIskaWebScraping(HomeModel homeModel, List<ClassTableModel> tablesMapList) {
@@ -73,13 +80,9 @@ public class IskaWebScraping {
                         res.add(classTableModel);
                     }
                 }
-                if (classTableModel.getResultado().equals(resultado)) {
-                    res.add(classTableModel);
-                }
-            } else {
-                if (classTableModel.getResultado().equals(resultado)) {
-                    res.add(classTableModel);
-                }
+            }
+            if (classTableModel.getResultado().equals(resultado)) {
+                res.add(classTableModel);
             }
         }
 

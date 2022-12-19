@@ -30,11 +30,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
 import androidx.core.view.MenuCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.Fragment;
 
 import com.google.android.material.navigation.NavigationView;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -54,6 +52,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     private boolean permissions_granted = false;
     private final String TAG = "ISKA_LOG";
     private DrawerLayout drawer;
+    NavigationView navigationView;
     private ConvertToTable convert;
     private String[] permissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE};
     private FragmentChooseYearPeriodDiscipline fragmentChooseYearPeriodDiscipline;
@@ -71,7 +70,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         // setSupportActionBar(toolbar);
 
         drawer = findViewById(R.id.drawer_layout);
-        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         MenuCompat.setGroupDividerEnabled(navigationView.getMenu(), true);
@@ -111,6 +110,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.nav_exportar:
                 drawer.closeDrawers();
+                navigationView.setCheckedItem(R.id.nav_home);
                 exportarDados();
                 break;
             case R.id.nav_sobre:
@@ -153,13 +153,13 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
         if(permissions_granted){
             try {
-                convert.convert("ISKA_NOTAS.xlsx", IskaWebScraping.getInstance().getTablesMapList());
+                convert.convertToExcel("ISKA_NOTAS.xlsx", IskaWebScraping.getInstance().getHomeModel(), IskaWebScraping.getInstance().getTablesMapList());
             } catch (Exception e) {
                 e.printStackTrace();
             }
 
             try {
-                convert.convertExcelToPdf("ISKA_NOTAS.xlsx");
+                convert.convertToPdf("ISKA_NOTAS.pdf", HomeActivity.this, IskaWebScraping.getInstance().getHomeModel(), IskaWebScraping.getInstance().getTablesMapList());
             } catch (Exception e) {
                 e.printStackTrace();
             }
