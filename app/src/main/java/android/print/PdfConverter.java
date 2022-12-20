@@ -1,11 +1,11 @@
-package android.print;/*
+package android.print;
 
+/*
  * Created on 11/15/17.
  * Written by Islam Salah with assistance from members of Blink22.com
  */
 
 import android.content.Context;
-import android.os.Build;
 import android.os.Handler;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
@@ -48,19 +48,15 @@ public class PdfConverter implements Runnable {
         mWebView.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageFinished(WebView view, String url) {
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT)
-                    throw new RuntimeException("call requires API level 19");
-                else {
-                    PrintDocumentAdapter documentAdapter = mWebView.createPrintDocumentAdapter();
-                    documentAdapter.onLayout(null, getPdfPrintAttrs(), null, new PrintDocumentAdapter.LayoutResultCallback() {
-                    }, null);
-                    documentAdapter.onWrite(new PageRange[]{PageRange.ALL_PAGES}, getOutputFileDescriptor(), null, new PrintDocumentAdapter.WriteResultCallback() {
-                        @Override
-                        public void onWriteFinished(PageRange[] pages) {
-                            destroy();
-                        }
-                    });
-                }
+                PrintDocumentAdapter documentAdapter = mWebView.createPrintDocumentAdapter("ISKA_NOTAS");
+                documentAdapter.onLayout(null, getPdfPrintAttrs(), null, new PrintDocumentAdapter.LayoutResultCallback() {
+                }, null);
+                documentAdapter.onWrite(new PageRange[]{PageRange.ALL_PAGES}, getOutputFileDescriptor(), null, new PrintDocumentAdapter.WriteResultCallback() {
+                    @Override
+                    public void onWriteFinished(PageRange[] pages) {
+                        destroy();
+                    }
+                });
             }
         });
         mWebView.loadDataWithBaseURL(null, mHtmlString, "text/html", "utf-8", null);
@@ -68,10 +64,6 @@ public class PdfConverter implements Runnable {
 
     public PrintAttributes getPdfPrintAttrs() {
         return mPdfPrintAttrs != null ? mPdfPrintAttrs : getDefaultPrintAttrs();
-    }
-
-    public void setPdfPrintAttrs(PrintAttributes printAttrs) {
-        this.mPdfPrintAttrs = printAttrs;
     }
 
     public void convert(Context context, String htmlString, File file) {
@@ -94,7 +86,12 @@ public class PdfConverter implements Runnable {
 
     private ParcelFileDescriptor getOutputFileDescriptor() {
         try {
-            mPdfFile.createNewFile();
+            final boolean result = mPdfFile.createNewFile();
+            if (!result) {
+                Log.d(TAG, "Unable to create file at specified path. It already exists");
+            } else {
+                Log.d(TAG, "Created file at specified path.");
+            }
             return ParcelFileDescriptor.open(mPdfFile, ParcelFileDescriptor.MODE_TRUNCATE | ParcelFileDescriptor.MODE_READ_WRITE);
         } catch (Exception e) {
             Log.d(TAG, "Failed to open ParcelFileDescriptor", e);
@@ -103,7 +100,6 @@ public class PdfConverter implements Runnable {
     }
 
     private PrintAttributes getDefaultPrintAttrs() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) return null;
 
         return new PrintAttributes.Builder()
                 .setMediaSize(PrintAttributes.MediaSize.ISO_A4.asLandscape())

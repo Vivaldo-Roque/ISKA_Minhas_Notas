@@ -25,18 +25,17 @@
             <ImageView
                 android:layout_width="120dp"
                 android:layout_height="100dp"
-                android:background="@drawable/logo_iska">
-            </ImageView>
+                android:background="@drawable/logo_iska"
+                android:contentDescription="@string/institute_logo" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="1dp"
+                android:layout_marginEnd="1dp"
                 android:textColor="@color/black"
                 android:textSize="24sp"
                 android:textStyle="bold"
-                android:text="Instituto Superior Politécnico de Kangonjo">
-            </TextView>
+                android:text="@string/institute_name" />
         </LinearLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -77,7 +76,7 @@
                         android:id="@+id/textView14"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Contacto"
+                        android:text="@string/contacto"
                         android:textColor="@color/black"
                         android:textSize="24sp"
                         android:textStyle="bold" />
@@ -149,7 +148,7 @@
                         android:id="@+id/textView8"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Estado actual"
+                        android:text="@string/estado_actual"
                         android:textColor="@color/black"
                         android:textSize="24sp"
                         android:textStyle="bold" />
@@ -289,7 +288,7 @@
                         android:id="@+id/textView26"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Cadeiras dispensadas"
+                        android:text="@string/cadeiras_dispensadas"
                         android:textColor="@color/black"
                         android:textSize="24sp"
                         android:textStyle="bold" />
@@ -336,7 +335,7 @@
                         android:id="@+id/textView24"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Exames"
+                        android:text="@string/exames"
                         android:textColor="@color/black"
                         android:textSize="24sp"
                         android:textStyle="bold" />
@@ -383,7 +382,7 @@
                         android:id="@+id/textView23"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Recursos"
+                        android:text="@string/recursos"
                         android:textColor="@color/black"
                         android:textSize="24sp"
                         android:textStyle="bold" />
@@ -400,7 +399,7 @@
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
-                android:id="@+id/card_view_cadeiras"
+                android:id="@+id/card_view_cadeiras_atraso"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="30dp"
@@ -432,7 +431,7 @@
                         android:id="@+id/textView25"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Cadeiras em atraso"
+                        android:text="@string/cadeiras_em_atraso"
                         android:textColor="@color/black"
                         android:textSize="24sp"
                         android:textStyle="bold" />

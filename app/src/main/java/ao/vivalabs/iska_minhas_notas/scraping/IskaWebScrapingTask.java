@@ -1,7 +1,5 @@
 package ao.vivalabs.iska_minhas_notas.scraping;
 
-import android.os.AsyncTask;
-
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -13,33 +11,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import ao.vivalabs.iska_minhas_notas.models.ClassTableModel;
 import ao.vivalabs.iska_minhas_notas.models.HomeModel;
 
-public class IskaWebScrapingTask extends AsyncTask<Void, Void, Void> {
+public class IskaWebScrapingTask {
 
-    private final List<ClassTableModel> tablesMapList = new ArrayList<>();
-    private boolean loggedin = false;
-    private boolean hasError = false;
-    private final String usermane;
-    private final String password;
-    private final IskaWebScrapingCallback iskaWebScrapingCallback;
-
-    public IskaWebScrapingTask(String username, String password, IskaWebScrapingCallback iskaWebScrapingCallback){
-        this.usermane = username;
-        this.password = password;
-        this.iskaWebScrapingCallback = iskaWebScrapingCallback;
-    }
-
-    @Override
-    protected void onPreExecute() {
-        super.onPreExecute();
-        iskaWebScrapingCallback.preExecute();
-    }
-
-    @Override
-    protected Void doInBackground(Void... voids) {
+    public IskaWebScrapingTask(String username, String password, IskaWebScrapingCallback iskaWebScrapingCallback) {
 
         String cssPathToTable = "div.table-responsive-sm table";
 
@@ -48,14 +27,16 @@ public class IskaWebScrapingTask extends AsyncTask<Void, Void, Void> {
         String home = "Discentes/discente.aspx";
         String classification = "Discentes/Secretaria/Classificacoes.aspx?s=B3738228BDA70CB1";
 
-        try{
+        boolean loggedIn = false;
+        boolean hasError = false;
+        try {
 
             String userAgent = "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36";
 
             // Create a "session" map here to persists cookies across all requests
             Map<String, String> session;
 
-            Connection.Response response = Jsoup.connect(url+"login.aspx")
+            Connection.Response response = Jsoup.connect(url + "login.aspx")
                     .userAgent(userAgent)
                     .method(Connection.Method.GET)
                     .execute();
@@ -64,20 +45,20 @@ public class IskaWebScrapingTask extends AsyncTask<Void, Void, Void> {
 
             // Get inputs necessary for login
             Document loginPage = response.parse();
-            String viewState = loginPage.getElementById("__VIEWSTATE").val();
-            String eventValidation = loginPage.getElementById("__EVENTVALIDATION").val();
-            String viewStateGenerator = loginPage.getElementById("__VIEWSTATEGENERATOR").val();
+            String viewState = Objects.requireNonNull(loginPage.getElementById("__VIEWSTATE")).val();
+            String eventValidation = Objects.requireNonNull(loginPage.getElementById("__EVENTVALIDATION")).val();
+            String viewStateGenerator = Objects.requireNonNull(loginPage.getElementById("__VIEWSTATEGENERATOR")).val();
 
             // Make the login
-            response = Jsoup.connect(url+"login.aspx")
+            response = Jsoup.connect(url + "login.aspx")
                     .cookies(session)
                     .userAgent(userAgent)
                     .data("__EVENTTARGET", "")
-                    .data("__EVENTARGUMENT","")
+                    .data("__EVENTARGUMENT", "")
                     .data("__VIEWSTATE", viewState)
                     .data("__EVENTVALIDATION", eventValidation)
                     .data("__VIEWSTATEGENERATOR", viewStateGenerator)
-                    .data("ctl00$ContentPlaceHolder1$TxtUtilizador", usermane)
+                    .data("ctl00$ContentPlaceHolder1$TxtUtilizador", username)
                     .data("ctl00$ContentPlaceHolder1$TxtSenha", password)
                     .data("ctl00$ContentPlaceHolder1$BtnEntrar", "Entrar")
                     .method(Connection.Method.POST)
@@ -86,9 +67,9 @@ public class IskaWebScrapingTask extends AsyncTask<Void, Void, Void> {
                     .execute();
 
             // Check login state
-            if(response.hasHeader("Location")){
+            if (response.hasHeader("Location")) {
 
-                loggedin = true;
+                loggedIn = true;
 
                 // update session after login
                 session.putAll(response.cookies());
@@ -96,29 +77,29 @@ public class IskaWebScrapingTask extends AsyncTask<Void, Void, Void> {
                 //get user status information
                 // ##########################################
 
-                Document doc = Jsoup.connect(url+home)
-                        .cookie("ASP.NET_SessionId", session.get("ASP.NET_SessionId"))
+                Document doc = Jsoup.connect(url + home)
+                        .cookie("ASP.NET_SessionId", Objects.requireNonNull(session.get("ASP.NET_SessionId")))
                         .followRedirects(false)
                         .userAgent(userAgent)
                         .get();
 
                 HomeModel homeModel = new HomeModel(
-                        doc.getElementById("ContentPlaceHolder1_LblNomeEstudante").text(),
-                        doc.getElementById("ContentPlaceHolder1_LblNumeroAluno").text(),
-                        doc.getElementById("ContentPlaceHolder1_LblCurso").text(),
-                        doc.getElementById("ContentPlaceHolder1_LblTesouraria").text(),
-                        doc.getElementById("ContentPlaceHolder1_lblAcademica").text(),
-                        doc.getElementById("ContentPlaceHolder1_lblMatricula").text(),
-                        doc.getElementById("ContentPlaceHolder1_lblLectivo").text(),
-                        doc.getElementById("ContentPlaceHolder1_lblTelefone").text(),
-                        doc.getElementById("ContentPlaceHolder1_lblTelefone2").text(),
-                        doc.getElementById("ContentPlaceHolder1_lblEmail").text()
+                        Objects.requireNonNull(doc.getElementById("ContentPlaceHolder1_LblNomeEstudante")).text(),
+                        Objects.requireNonNull(doc.getElementById("ContentPlaceHolder1_LblNumeroAluno")).text(),
+                        Objects.requireNonNull(doc.getElementById("ContentPlaceHolder1_LblCurso")).text(),
+                        Objects.requireNonNull(doc.getElementById("ContentPlaceHolder1_LblTesouraria")).text(),
+                        Objects.requireNonNull(doc.getElementById("ContentPlaceHolder1_lblAcademica")).text(),
+                        Objects.requireNonNull(doc.getElementById("ContentPlaceHolder1_lblMatricula")).text(),
+                        Objects.requireNonNull(doc.getElementById("ContentPlaceHolder1_lblLectivo")).text(),
+                        Objects.requireNonNull(doc.getElementById("ContentPlaceHolder1_lblTelefone")).text(),
+                        Objects.requireNonNull(doc.getElementById("ContentPlaceHolder1_lblTelefone2")).text(),
+                        Objects.requireNonNull(doc.getElementById("ContentPlaceHolder1_lblEmail")).text()
                 );
 
                 // ##########################################
                 // get user classification
-                doc = Jsoup.connect(url+classification)
-                        .cookie("ASP.NET_SessionId", session.get("ASP.NET_SessionId"))
+                doc = Jsoup.connect(url + classification)
+                        .cookie("ASP.NET_SessionId", Objects.requireNonNull(session.get("ASP.NET_SessionId")))
                         .followRedirects(false)
                         .userAgent(userAgent)
                         .get();
@@ -130,12 +111,14 @@ public class IskaWebScrapingTask extends AsyncTask<Void, Void, Void> {
                 Element tableHeader = classificacaoTable.select("tr").first();
 
                 // save cells to hasMap
+                List<ClassTableModel> tablesMapList = new ArrayList<>();
                 for(Element table: classificacaoTable.select("tbody")){
                     Elements tempRows = table.select("tr");
                     for(int i = 0; i < tempRows.size(); i++){
                         Map<String, String> tableMap = new HashMap<>();
                         Elements tempCols = tempRows.get(i).select("td");
                         for(int j = 0; j < tempCols.size(); j++){
+                            assert tableHeader != null;
                             tableMap.put(tableHeader.child(j).text(), tempCols.get(j).text());
                         }
 
@@ -159,8 +142,6 @@ public class IskaWebScrapingTask extends AsyncTask<Void, Void, Void> {
                     }
                 }
                 IskaWebScraping.getInstance().SetIskaWebScraping(homeModel, tablesMapList);
-            } else{
-                loggedin = false;
             }
 
         } catch (IOException e){
@@ -168,12 +149,7 @@ public class IskaWebScrapingTask extends AsyncTask<Void, Void, Void> {
             hasError = true;
         }
 
-        return null;
-    }
+        iskaWebScrapingCallback.postExecute(loggedIn, hasError);
 
-    @Override
-    protected void onPostExecute(Void unused) {
-        super.onPostExecute(unused);
-        iskaWebScrapingCallback.postExecute(loggedin, hasError);
     }
 }

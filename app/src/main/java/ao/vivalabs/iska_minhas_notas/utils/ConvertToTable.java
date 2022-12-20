@@ -41,12 +41,18 @@ import ao.vivalabs.iska_minhas_notas.models.HomeModel;
 
 public class ConvertToTable {
 
-    private File downloadFolder;
+    private final File downloadFolder;
+    private final String TAG = "ConvertToTable";
 
     public ConvertToTable() {
         downloadFolder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + File.separator + "ISKA");
         if (!getDownloadFolder().exists()) {
-            getDownloadFolder().mkdirs();
+            final boolean result = getDownloadFolder().mkdirs();
+            if (!result) {
+                Log.d(TAG, "Unable to create file at specified path. It already exists");
+            } else {
+                Log.d(TAG, "Created file at specified path.");
+            }
         }
     }
 
@@ -88,7 +94,7 @@ public class ConvertToTable {
         XSSFSheet sheet2 = (XSSFSheet) workbook.createSheet("notas");
 
         sheet1.setFitToPage(true);
-        XSSFPrintSetup printSetup1 = (XSSFPrintSetup) sheet1.getPrintSetup();
+        XSSFPrintSetup printSetup1 = sheet1.getPrintSetup();
         printSetup1.setLandscape(true);
         printSetup1.setPaperSize(XSSFPrintSetup.A4_PAPERSIZE);
         printSetup1.setFitWidth((short) 1);
@@ -101,7 +107,7 @@ public class ConvertToTable {
         printSetup1.setFooterMargin(0.3);
 
         sheet2.setFitToPage(true);
-        XSSFPrintSetup printSetup2 = (XSSFPrintSetup) sheet2.getPrintSetup();
+        XSSFPrintSetup printSetup2 = sheet2.getPrintSetup();
         printSetup2.setLandscape(true);
         printSetup2.setPaperSize(XSSFPrintSetup.A4_PAPERSIZE);
         printSetup2.setFitWidth((short) 1);
@@ -123,9 +129,9 @@ public class ConvertToTable {
 
         /* Let us define the required Style for the table */
         CTTableStyleInfo table_style_1 = cttable1.addNewTableStyleInfo();
-        table_style_1.setName("TableStyleMedium3");
+        table_style_1.setName("TableStyleMedium10");
         CTTableStyleInfo table_style_2 = cttable2.addNewTableStyleInfo();
-        table_style_2.setName("TableStyleMedium3");
+        table_style_2.setName("TableStyleMedium10");
 
         /* Set Table Style Options */
         table_style_1.setShowColumnStripes(false); // showColumnStripes=0
@@ -389,7 +395,12 @@ public class ConvertToTable {
         File file = new File(getDownloadFolder().getPath() + File.separator + String.format("%s_", homeModel.getNumeroAluno().replaceAll("[^0-9]", "")) + fileName);
 
         if (!getDownloadFolder().exists()) {
-            getDownloadFolder().mkdirs();
+            final boolean result = getDownloadFolder().mkdirs();
+            if (!result) {
+                Log.d(TAG, "Unable to create file at specified path. It already exists");
+            } else {
+                Log.d(TAG, "Created file at specified path.");
+            }
         }
 
         // lets write the excel data to file now
@@ -397,12 +408,12 @@ public class ConvertToTable {
         workbook.write(fos);
         fos.close();
 
-        Log.d("ISKA_LOG", "ISKA ==> " + String.format("%s_", homeModel.getNumeroAluno().replaceAll("[^0-9]", "")) + fileName + " written successfully");
+        Log.d(TAG, "ISKA ==> " + String.format("%s_", homeModel.getNumeroAluno().replaceAll("[^0-9]", "")) + fileName + " written successfully");
     }
 
-    public void convertToPdf(String fileName, Context context, HomeModel homeModel, List<ClassTableModel> classificationList) throws Exception {
+    public void convertToPdf(String fileName, Context context, HomeModel homeModel, List<ClassTableModel> classificationList) {
 
-        final String html_body = "<html><head> <style> #notes { font-family: Arial, Helvetica, sans-serif; border-collapse: collapse; width: 100%; text-align: center; } #notes td, #notes th { border: 1px solid #ddd; padding: 8px 12px 8px 12px; border: none; } #notes tr:nth-child(even) { background-color: #fce4d6; } #notes th { padding-top: 12px; padding-bottom: 12px; background-color: #ed7d31; color: black; } </style></head><body>";
+        final String html_body = "<html><head> <style> #notes { font-family: Arial, Helvetica, sans-serif; border-collapse: collapse; width: 100%; text-align: center; } #notes td, #notes th { border: 1px solid #ddd; padding: 8px 12px 8px 12px; border: none; } #notes tr:nth-child(odd) { /* background-color: #fce4d6; */ background-color: #f8cbad; } #notes tr:nth-child(even) { background-color: #fce4d6; } #notes th { padding-top: 12px; padding-bottom: 12px; background-color: #ed7d31; color: black; } </style></head><body>";
         final String student_div = String.format("<div><p><strong>Número estudante:</strong> %s</p><p><strong>Nome:</strong> %s</p><p><strong>Curso:</strong> %s</p><p><strong>Instituto do Ensino Superior:</strong> ISKA</p></div>", homeModel.getNumeroAluno().replaceAll("[^0-9]", ""), homeModel.getNomeEstudante(), homeModel.getCurso());
         final String table_tbody = "<table id=\"notes\"> <thead> <tr> <th> Disciplina </th> <th> Abrev. </th> <th> Ano </th> <th> Turma </th> <th> Tipo </th> <th> Nota Final </th> <th> A. C. </th> <th> Final Contínua </th> <th> 1º P. </th> <th> 2º P. </th> <th> Resultado </th> <th> Exame </th> <th> Recurso </th> <th> Ép. Espec. </th> <th> Melhoria </th> </tr> </thead> <tbody>";
 
@@ -420,7 +431,7 @@ public class ConvertToTable {
         File file = new File(getDownloadFolder().getPath() + File.separator + String.format("%s_", homeModel.getNumeroAluno().replaceAll("[^0-9]", "")) + fileName);
         converter.convert(context, finalString, file);
 
-        Log.d("ISKA_LOG", "ISKA ==> " + String.format("%s_", homeModel.getNumeroAluno().replaceAll("[^0-9]", "")) + fileName + " written successfully");
+        Log.d(TAG, "ISKA ==> " + String.format("%s_", homeModel.getNumeroAluno().replaceAll("[^0-9]", "")) + fileName + " written successfully");
     }
 
     public boolean isNumeric(String strNum) {
@@ -428,7 +439,7 @@ public class ConvertToTable {
             return false;
         }
         try {
-            double d = Double.parseDouble(strNum);
+            Double.parseDouble(strNum);
         } catch (NumberFormatException nfe) {
             return false;
         }

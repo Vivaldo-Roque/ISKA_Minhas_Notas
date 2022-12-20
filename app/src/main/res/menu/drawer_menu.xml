@@ -3,22 +3,30 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
-    <group android:id="@+id/menu_top" android:checkableBehavior="single">
-        <item android:id="@+id/nav_home"
+    <group
+        android:id="@+id/menu_top"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_home"
             android:icon="@drawable/ic_home"
-            android:title="Inicio"/>
-        <item android:id="@+id/nav_notes"
+            android:title="@string/home_menu_inicio" />
+        <item
+            android:id="@+id/nav_notes"
             android:icon="@drawable/ic_notes"
-            android:title="Notas"/>
+            android:title="@string/home_menu_notas" />
     </group>
 
-    <group android:id="@+id/menu_bottom" android:checkableBehavior="single">
-        <item android:id="@+id/nav_exportar"
+    <group
+        android:id="@+id/menu_bottom"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_exportar"
             android:icon="@drawable/ic_baseline_save_alt_24"
-            android:title="Exportar dados"/>
-        <item android:id="@+id/nav_sobre"
+            android:title="@string/home_menu_exportar_dados" />
+        <item
+            android:id="@+id/nav_sobre"
             android:icon="@drawable/ic_baseline_info_24"
-            android:title="Acerca da aplicação"/>
+            android:title="@string/home_menu_about" />
     </group>
 
 </menu>

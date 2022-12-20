@@ -1,7 +1,17 @@
 package ao.vivalabs.iska_minhas_notas.utils;
 
+/*
+ * Created on 20/12/2022.
+ * Written by Vivaldo Roque
+ */
+
 import android.content.Context;
-import android.util.TypedValue;
+
+/**
+ * Converts Dp to Px.
+ * <p>
+ * Converts Sp to Px
+ */
 
 public class Methods {
     public static int dpToPx(Context context, float dp) {

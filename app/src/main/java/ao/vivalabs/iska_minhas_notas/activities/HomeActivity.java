@@ -3,7 +3,6 @@ package ao.vivalabs.iska_minhas_notas.activities;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -15,11 +14,10 @@ import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -38,6 +36,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import ao.vivalabs.iska_minhas_notas.R;
 import ao.vivalabs.iska_minhas_notas.fragments.FragmentAbout;
@@ -50,15 +50,12 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
     private final int REQUEST_ID_MULTIPLE_PERMISSIONS = 1;
     private boolean permissions_granted = false;
-    private final String TAG = "ISKA_LOG";
     private DrawerLayout drawer;
     NavigationView navigationView;
     private ConvertToTable convert;
-    private String[] permissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE};
-    private FragmentChooseYearPeriodDiscipline fragmentChooseYearPeriodDiscipline;
-    private FragmentAbout fragmentAbout;
+    private final String[] permissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE};
     boolean doubleBackToExitPressedOnce = false;
-
+    MenuItem nav_exportar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,6 +68,9 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
         drawer = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
+        Menu menuNav = navigationView.getMenu();
+        nav_exportar = menuNav.findItem(R.id.nav_exportar);
+
         navigationView.setNavigationItemSelectedListener(this);
 
         MenuCompat.setGroupDividerEnabled(navigationView.getMenu(), true);
@@ -99,23 +99,21 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.nav_home:
-                drawer.closeDrawers();
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new FragmentHome(), "FRAG_HOME").commit();
-                break;
-            case R.id.nav_notes:
-                drawer.closeDrawers();
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new FragmentChooseYearPeriodDiscipline(), "FRAG_SELECT").commit();
-                break;
-            case R.id.nav_exportar:
-                drawer.closeDrawers();
-                navigationView.setCheckedItem(R.id.nav_home);
-                exportarDados();
-                break;
-            case R.id.nav_sobre:
-                drawer.closeDrawers();
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new FragmentAbout(), "FRAG_ABOUT").commit();
+        int itemId = item.getItemId();
+
+        if (itemId == R.id.nav_home) {
+            drawer.closeDrawers();
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new FragmentHome(), "FRAG_HOME").commit();
+        } else if (itemId == R.id.nav_notes) {
+            drawer.closeDrawers();
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new FragmentChooseYearPeriodDiscipline(), "FRAG_SELECT").commit();
+        } else if (itemId == R.id.nav_exportar) {
+            drawer.closeDrawers();
+            navigationView.setCheckedItem(R.id.nav_home);
+            exportarDados();
+        } else if (itemId == R.id.nav_sobre) {
+            drawer.closeDrawers();
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new FragmentAbout(), "FRAG_ABOUT").commit();
         }
 
         return true;
@@ -124,26 +122,23 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onBackPressed() {
 
-        fragmentChooseYearPeriodDiscipline = (FragmentChooseYearPeriodDiscipline) getSupportFragmentManager().findFragmentByTag("FRAG_SELECT");
-        fragmentAbout = (FragmentAbout) getSupportFragmentManager().findFragmentByTag("FRAG_ABOUT");;
+        FragmentChooseYearPeriodDiscipline fragmentChooseYearPeriodDiscipline = (FragmentChooseYearPeriodDiscipline) getSupportFragmentManager().findFragmentByTag("FRAG_SELECT");
+        FragmentAbout fragmentAbout = (FragmentAbout) getSupportFragmentManager().findFragmentByTag("FRAG_ABOUT");
 
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-        } else if(fragmentChooseYearPeriodDiscipline != null && fragmentChooseYearPeriodDiscipline.isVisible()){
+        } else if (fragmentChooseYearPeriodDiscipline != null && fragmentChooseYearPeriodDiscipline.isVisible()) {
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new FragmentHome()).commit();
-        }else if(fragmentAbout != null && fragmentAbout.isVisible()){
+        } else if (fragmentAbout != null && fragmentAbout.isVisible()) {
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new FragmentHome()).commit();
-        }else {
+        } else {
             if (doubleBackToExitPressedOnce) {
                 super.onBackPressed();
-                return;
-            }else{
+            } else {
                 this.doubleBackToExitPressedOnce = true;
                 Toast.makeText(this, "Clique 2 vezes em VOLTAR para sair", Toast.LENGTH_SHORT).show();
-                new Handler(Looper.getMainLooper()).postDelayed(() -> doubleBackToExitPressedOnce=false, 2000);
+                new Handler(Looper.getMainLooper()).postDelayed(() -> doubleBackToExitPressedOnce = false, 2000);
             }
-
-
         }
     }
 
@@ -151,27 +146,37 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
         permissions_granted = checkAndRequestPermissions();
 
-        if(permissions_granted){
-            try {
-                convert.convertToExcel("ISKA_NOTAS.xlsx", IskaWebScraping.getInstance().getHomeModel(), IskaWebScraping.getInstance().getTablesMapList());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        ExecutorService convertTask = Executors.newSingleThreadExecutor();
 
-            try {
-                convert.convertToPdf("ISKA_NOTAS.pdf", HomeActivity.this, IskaWebScraping.getInstance().getHomeModel(), IskaWebScraping.getInstance().getTablesMapList());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        Handler handler = new Handler(Looper.getMainLooper());
 
-            String msg = String.format("2 ficheiros (Excel e Pdf) foram salvo em\n \"/Download/ISKA\"");
-            dialogMsg("Exportar", msg);
-            
+        if (permissions_granted) {
+
+            nav_exportar.setEnabled(false);
+            convertTask.execute(() -> {
+                try {
+                    convert.convertToExcel("ISKA_NOTAS.xlsx", IskaWebScraping.getInstance().getHomeModel(), IskaWebScraping.getInstance().getTablesMapList());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                try {
+                    convert.convertToPdf("ISKA_NOTAS.pdf", HomeActivity.this, IskaWebScraping.getInstance().getHomeModel(), IskaWebScraping.getInstance().getTablesMapList());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                handler.post(() -> {
+                    String msg = "2 ficheiros (Excel e Pdf) foram salvo em\n \"/Download/ISKA\"";
+                    dialogMsg(msg);
+                    nav_exportar.setEnabled(true);
+                });
+            });
         }
     }
 
     public boolean shouldAskPermission() {
-        return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M);
+        return true;
     }
 
     private boolean shouldAskPermission(Context context, String permission) {
@@ -199,10 +204,8 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                     Uri uri = Uri.fromParts("package", this.getPackageName(), null);
                     intent.setData(uri);
                     storageActivityResultLauncher.launch(intent);
-                } catch (Exception e){
-                    Intent intent = new Intent();
-                    intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
-                    storageActivityResultLauncher.launch(intent);
+                } catch (Exception ignored) {
+
                 }
                 return false;
             }
@@ -230,33 +233,22 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         startActivity(intent);
     }
 
-    private void dialogMsg(String title, String msg) {
-        new AlertDialog.Builder(this).setTitle(title).setMessage(msg)
+    private void dialogMsg(String msg) {
+        new AlertDialog.Builder(this).setTitle("Exportar").setMessage(msg)
                 .setCancelable(false)
-                .setPositiveButton("Fechar", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                }).show();
+                .setPositiveButton("Fechar", (dialog, which) -> dialog.dismiss()).show();
     }
 
     private void showRational(String title, String msg) {
         new AlertDialog.Builder(this).setTitle(title).setMessage(msg)
                 .setCancelable(false)
-                .setNegativeButton("TENHO CERTEZA", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // proceed with logic by disabling the related features or quit the app.
-                        dialog.dismiss();
-                    }
+                .setNegativeButton("TENHO CERTEZA", (dialog, which) -> {
+                    // proceed with logic by disabling the related features or quit the app.
+                    dialog.dismiss();
                 })
-                .setPositiveButton("TENTAR NOVAMENTE", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        checkAndRequestPermissions();
-                        dialog.dismiss();
-                    }
+                .setPositiveButton("TENTAR NOVAMENTE", (dialog, which) -> {
+                    checkAndRequestPermissions();
+                    dialog.dismiss();
                 }).show();
 
     }
@@ -264,40 +256,17 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     private void dialogForSettings(String title, String msg) {
         new AlertDialog.Builder(this).setTitle(title).setMessage(msg)
                 .setCancelable(false)
-                .setNegativeButton("AGORA NÂO", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                })
-                .setPositiveButton("DEFINIÇÕES", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        goToSettings();
-                        dialog.dismiss();
-                    }
+                .setNegativeButton("AGORA NÂO", (dialog, which) -> dialog.dismiss())
+                .setPositiveButton("DEFINIÇÕES", (dialog, which) -> {
+                    goToSettings();
+                    dialog.dismiss();
                 }).show();
     }
 
-    private ActivityResultLauncher<Intent> storageActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
-        @Override
-        public void onActivityResult(ActivityResult result) {
-            // Here we handle the result of our intent
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
-                if(Environment.isExternalStorageManager()){
-                    // permission granted do something
-                } else{
-                    // permission denied
-                }
-            } else {
-
-            }
-        }
-    });
-
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        String TAG = "HomeActivity";
         Log.d(TAG, "Permission callback called-------");
         if (requestCode == REQUEST_ID_MULTIPLE_PERMISSIONS) {
             Map<String, Integer> perms = new HashMap<>();
@@ -347,9 +316,9 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                             String temp = permission.substring(permission.lastIndexOf('.') + 1);
                             String op = temp.split("_")[0];
 
-                            if(Objects.equals(op, "WRITE")){
+                            if (Objects.equals(op, "WRITE")) {
                                 dialogForSettings("Permissão escrita negada", "Agora você deve permitir o acesso à escrita nas definições.");
-                            } else if (Objects.equals(op, "READ")){
+                            } else if (Objects.equals(op, "READ")) {
                                 dialogForSettings("Permissão leitura negada", "Agora você deve permitir o acesso à leitura nas definições.");
                             }
                         }
@@ -358,4 +327,16 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             }
         }
     }
+
+    private final ActivityResultLauncher<Intent> storageActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+        // Here we handle the result of our intent
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (!Environment.isExternalStorageManager()) {
+                // permission denied
+                showRational("Permissão leitura e escrita negada", "Sem essas permissões, este aplicativo não consegue ler e escrever ficheiros multimédia. Tem certeza de que deseja negar estas permissões.");
+            }
+        }
+    });
+
+
 }

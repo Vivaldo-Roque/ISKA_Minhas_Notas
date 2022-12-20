@@ -21,7 +21,7 @@ public class ThreeLevelListAdapter extends BaseExpandableListAdapter {
     String[] parentHeaders;
     List<String[]> secondLevel;
     List<LinkedHashMap<String, String[]>> data;
-    private Context context;
+    private final Context context;
 
     public ThreeLevelListAdapter(Context context, String[] parentHeader, List<String[]> secondLevel, List<LinkedHashMap<String, String[]>> data) {
         this.context = context;
@@ -82,8 +82,8 @@ public class ThreeLevelListAdapter extends BaseExpandableListAdapter {
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
 
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        convertView = inflater.inflate(R.layout.first_row, null);
-        TextView text = (TextView) convertView.findViewById(R.id.rowParentText);
+        convertView = inflater.inflate(R.layout.first_row, parent, false);
+        TextView text = convertView.findViewById(R.id.rowParentText);
         text.setText(this.parentHeaders[groupPosition]);
 
         return convertView;

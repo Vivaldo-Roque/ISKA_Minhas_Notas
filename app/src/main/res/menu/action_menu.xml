@@ -5,7 +5,7 @@
     <item
         android:id="@+id/action_sobre"
         android:icon="@drawable/ic_baseline_info_24"
-        android:title="Acerca da aplicação"
+        android:title="@string/login_menu_action_title"
         app:showAsAction="always"
         android:orderInCategory="0"/>
 

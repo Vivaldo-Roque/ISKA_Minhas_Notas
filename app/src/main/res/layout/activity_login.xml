@@ -37,8 +37,8 @@
                 android:textSize="24sp"
                 android:textStyle="bold"
                 android:textColor="@color/black"
-                android:layout_marginLeft="?android:attr/actionBarSize"
-                android:text="ISKA">
+                android:layout_marginStart="?android:attr/actionBarSize"
+                android:text="@string/home_appbar_title">
 
             </TextView>
 
@@ -46,9 +46,9 @@
 
     </androidx.appcompat.widget.Toolbar>
 
-    <ScrollView android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        xmlns:android="http://schemas.android.com/apk/res/android">
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -69,7 +69,7 @@
                     android:id="@+id/textView2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Senha"
+                    android:text="@string/login_password_label"
                     android:textColor="@color/black"
                     android:textSize="24sp" />
 
@@ -79,10 +79,11 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/edit_text_rounded"
                     android:ems="15"
-                    android:hint="Senha"
+                    android:autofillHints=""
                     android:focusedByDefault="false"
                     android:inputType="textPassword"
                     android:minHeight="48dp"
+                    android:hint="@string/login_password_label"
                     android:padding="10dp" />
             </LinearLayout>
 
@@ -94,6 +95,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
+                android:contentDescription="@string/institute_logo"
                 app:srcCompat="@drawable/logo_iska" />
 
             <TextView
@@ -101,7 +103,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:text="Secretaria online"
+                android:text="@string/login_title"
                 android:textColor="@color/black"
                 android:textSize="36sp"
                 android:textStyle="bold"
@@ -123,7 +125,7 @@
                     android:id="@+id/textView3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Utilizador"
+                    android:text="@string/login_username_label"
                     android:textColor="@color/black"
                     android:textSize="24sp" />
 
@@ -133,10 +135,11 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/edit_text_rounded"
                     android:ems="15"
-                    android:hint="Nº de estudante"
+                    android:autofillHints=""
                     android:focusedByDefault="false"
                     android:inputType="number"
                     android:minHeight="48dp"
+                    android:hint="@string/login_username_hint"
                     android:padding="10dp" />
             </LinearLayout>
 
@@ -147,7 +150,7 @@
                 android:layout_marginTop="50dp"
                 android:background="@drawable/button_rounded"
                 android:padding="10dp"
-                android:text="Entar"
+                android:text="@string/login_btn_entrar"
                 android:textColor="@color/white"
                 android:textSize="20sp"
                 app:backgroundTint="#348055"
@@ -163,7 +166,6 @@
                 android:layout_marginTop="30dp"
                 android:layout_marginRight="5dp"
                 android:visibility="gone"
-                android:text="Não foi possível autenticar, por favor, tente novamente!"
                 android:textColor="@android:color/holo_red_light"
                 android:textSize="24sp"
                 android:textStyle="bold"

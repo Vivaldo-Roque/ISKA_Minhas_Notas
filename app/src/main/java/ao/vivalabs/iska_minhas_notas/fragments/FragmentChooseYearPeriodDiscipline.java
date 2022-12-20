@@ -1,5 +1,6 @@
 package ao.vivalabs.iska_minhas_notas.fragments;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,13 +15,15 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import ao.vivalabs.iska_minhas_notas.R;
 import ao.vivalabs.iska_minhas_notas.models.ClassTableModel;
 import ao.vivalabs.iska_minhas_notas.scraping.IskaWebScraping;
-import ao.vivalabs.iska_minhas_notas.R;
 import ao.vivalabs.iska_minhas_notas.three_level_ELV.ThreeLevelListAdapter;
 import ao.vivalabs.iska_minhas_notas.utils.Methods;
 
 public class FragmentChooseYearPeriodDiscipline extends Fragment {
+
+    private Context mContext;
 
     String[] parent = new String[]{};
 
@@ -49,32 +52,34 @@ public class FragmentChooseYearPeriodDiscipline extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         iska = IskaWebScraping.getInstance();
         iska.findAllYears(iska.getTablesMapList());
-        setUpAdapter();
+        setUpAdapter(view);
     }
 
-    private void setUpAdapter() {
+    private void setUpAdapter(@NonNull View view) {
 
+        // Adicionar anos ao primeiro nivel da lista
         parent = iska.findAllYears(iska.getTablesMapList());
 
+        // Adicionar periodos ao segundo nivel da lista
         secondLevel.add(periodos);
         secondLevel.add(periodos);
         secondLevel.add(periodos);
         secondLevel.add(periodos);
 
-        for(String year: parent){
+        for (String year : parent) {
             LinkedHashMap<String, String[]> thirdLevelPeriodo = new LinkedHashMap<>();
-            List<ClassTableModel> years = iska.findAllByYear(year.replace(" Ano", ""), iska.getTablesMapList());
+            List<ClassTableModel> currentYear = iska.findAllByYear(year.replace(" Ano", ""), iska.getTablesMapList());
 
-            if(!years.isEmpty()){
-                List<ClassTableModel> simeste1 = iska.findAllByPeriod("1º Semestre", years);
-                List<ClassTableModel> simeste2 = iska.findAllByPeriod("2º Semestre", years);
-                List<ClassTableModel> anual = iska.findAllByPeriod("Anual", years);
+            if (!currentYear.isEmpty()) {
+                List<ClassTableModel> simeste1 = iska.findAllByPeriod("1º Semestre", currentYear);
+                List<ClassTableModel> simeste2 = iska.findAllByPeriod("2º Semestre", currentYear);
+                List<ClassTableModel> anual = iska.findAllByPeriod("Anual", currentYear);
 
                 List<String> cadeiras = new ArrayList<>();
 
-                if(!simeste1.isEmpty()){
+                if (!simeste1.isEmpty()) {
 
-                    for(ClassTableModel cadeira: simeste1){
+                    for (ClassTableModel cadeira : simeste1) {
                         cadeiras.add(cadeira.getDisciplina());
                     }
                     thirdLevelPeriodo.put(periodos[0], cadeiras.toArray(new String[0]));
@@ -103,11 +108,11 @@ public class FragmentChooseYearPeriodDiscipline extends Fragment {
             data.add(thirdLevelPeriodo);
         }
 
-        expandableListView = getView().findViewById(R.id.exp_list_view_year);
+        expandableListView = view.findViewById(R.id.exp_list_view_year);
         //passing three level of information to constructor
         ThreeLevelListAdapter threeLevelListAdapterAdapter = new ThreeLevelListAdapter(this.getContext(), parent, secondLevel, data);
         expandableListView.setAdapter(threeLevelListAdapterAdapter);
-        expandableListView.setDividerHeight(Methods.dpToPx(getContext(), 1f));
+        expandableListView.setDividerHeight(Methods.dpToPx(mContext, 1f));
         expandableListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
             int previousGroup = -1;
 
@@ -120,4 +125,9 @@ public class FragmentChooseYearPeriodDiscipline extends Fragment {
         });
     }
 
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        mContext = context;
+    }
 }

@@ -5,10 +5,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import java.util.List;
@@ -22,8 +22,7 @@ import ao.vivalabs.iska_minhas_notas.utils.Methods;
 public class SecondLevelAdapter extends BaseExpandableListAdapter {
     List<String[]> data;
     String[] headers;
-    ImageView ivGroupIndicator;
-    private Context context;
+    private final Context context;
 
 
     public SecondLevelAdapter(Context context, String[] headers, List<String[]> data) {
@@ -53,8 +52,8 @@ public class SecondLevelAdapter extends BaseExpandableListAdapter {
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        convertView = inflater.inflate(R.layout.second_row, null);
-        TextView text = (TextView) convertView.findViewById(R.id.rowSecondText);
+        convertView = inflater.inflate(R.layout.second_row, parent, false);
+        TextView text = convertView.findViewById(R.id.rowSecondText);
         String groupText = getGroup(groupPosition).toString();
         text.setText(groupText);
         return convertView;
@@ -79,9 +78,9 @@ public class SecondLevelAdapter extends BaseExpandableListAdapter {
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
 
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        convertView = inflater.inflate(R.layout.third_row, null);
+        convertView = inflater.inflate(R.layout.third_row, parent, false);
 
-        LinearLayout linearLayout = (LinearLayout) convertView.findViewById(R.id.rowThirdTextList);
+        LinearLayout linearLayout = convertView.findViewById(R.id.rowThirdTextList);
 
         String[] childArray = data.get(groupPosition);
 
@@ -89,16 +88,13 @@ public class SecondLevelAdapter extends BaseExpandableListAdapter {
 
         TextView newTextView = new TextView(context);
         newTextView.setText(text);
-        newTextView.setTextColor(context.getResources().getColor(R.color.black));
-        newTextView.setPadding(Methods.dpToPx(context, 20f),0,0,0);
-        newTextView.setTextSize(20); // for example
-        newTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                IskaWebScraping iska = IskaWebScraping.getInstance();
-                IskaWebScraping.getInstance().setDisciplina(iska.findByDiscipline(((TextView) view).getText().toString(), iska.getTablesMapList()));
-                ((FragmentActivity) context).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new FragmentNotes(), "FRAG_NOTES").addToBackStack(null).commit();
-            }
+        newTextView.setTextColor(ContextCompat.getColor(context, R.color.black));
+        newTextView.setPadding(Methods.dpToPx(context, 20f), 0, 0, 0);
+        newTextView.setTextSize(20);
+        newTextView.setOnClickListener(view -> {
+            IskaWebScraping iska = IskaWebScraping.getInstance();
+            IskaWebScraping.getInstance().setDisciplina(iska.findByDiscipline(((TextView) view).getText().toString(), iska.getTablesMapList()));
+            ((FragmentActivity) context).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new FragmentNotes(), "FRAG_NOTES").addToBackStack(null).commit();
         });
         linearLayout.addView(newTextView);
 

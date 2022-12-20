@@ -1,18 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="10dp"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    tools:ignore="UseCompoundDrawables">
 
     <TextView
         android:id="@+id/rowSecondText"
         android:layout_weight="1"
-        android:paddingLeft="10dp"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
+        android:paddingEnd="10dp"
         android:layout_height="wrap_content"
         android:textColor="@android:color/black"
-        android:textSize="22sp"/>
+        android:textSize="22sp"
+        tools:ignore="RtlSymmetry" />
 
     <ImageView
         android:layout_gravity="end"
@@ -20,6 +23,5 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/ic_baseline_keyboard_arrow_down_24"
-        android:layout_centerVertical="true"
-        android:layout_alignParentRight="true"/>
+        tools:ignore="ContentDescription" />
 </LinearLayout>

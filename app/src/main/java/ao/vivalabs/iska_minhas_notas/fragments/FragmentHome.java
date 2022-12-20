@@ -10,12 +10,12 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import ao.vivalabs.iska_minhas_notas.R;
 import ao.vivalabs.iska_minhas_notas.models.ClassTableModel;
 import ao.vivalabs.iska_minhas_notas.scraping.IskaWebScraping;
-import ao.vivalabs.iska_minhas_notas.R;
-import ao.vivalabs.iska_minhas_notas.utils.Methods;
 
 public class FragmentHome extends Fragment {
 
@@ -41,65 +41,72 @@ public class FragmentHome extends Fragment {
         IskaWebScraping iska;
 
         iska = IskaWebScraping.getInstance();
-
-        CardView cardViewCadeirasDispensadas = view.findViewById(R.id.card_view_cadeiras);
-        ViewGroup viewGroup = (ViewGroup) cardViewCadeirasDispensadas;
+        ViewGroup viewGroup = view.<CardView>findViewById(R.id.card_view_dispensadas);
         LinearLayout linearLayoutCadeirasDispensadas = (LinearLayout) viewGroup.getChildAt(0);
 
-        for(ClassTableModel classTableModel : iska.findByResultado("Disp.")){
+        for (ClassTableModel classTableModel : iska.findByResultado("Disp.")) {
             TextView newTextView = new TextView(getContext());
-            newTextView.setText("• "+classTableModel.getDisciplina());
-            newTextView.setTextColor(getContext().getResources().getColor(R.color.black));
+            newTextView.setText("• ".concat(classTableModel.getDisciplina()));
+            newTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.black));
             newTextView.setTextSize(18);
             linearLayoutCadeirasDispensadas.addView(newTextView);
         }
 
-        CardView cardViewExames = view.findViewById(R.id.card_view_exames);
-        viewGroup = (ViewGroup) cardViewExames;
+        viewGroup = view.<CardView>findViewById(R.id.card_view_exames);
         LinearLayout linearLayoutExames = (LinearLayout) viewGroup.getChildAt(0);
 
-        for(ClassTableModel classTableModel : iska.findByResultado("Exame")){
+        for (ClassTableModel classTableModel : iska.findByResultado("Exame")) {
             TextView newTextView = new TextView(getContext());
-            newTextView.setText("• "+classTableModel.getDisciplina());
-            newTextView.setTextColor(getContext().getResources().getColor(R.color.black));
+            newTextView.setText("• ".concat(classTableModel.getDisciplina()));
+            newTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.black));
             newTextView.setTextSize(18);
             linearLayoutExames.addView(newTextView);
         }
 
-        CardView cardViewRecursos = view.findViewById(R.id.card_view_recursos);
-        viewGroup = (ViewGroup) cardViewRecursos;
+        viewGroup = view.<CardView>findViewById(R.id.card_view_recursos);
         LinearLayout linearLayoutRecursos = (LinearLayout) viewGroup.getChildAt(0);
 
-        for(ClassTableModel classTableModel : iska.findByResultado("Recurso")){
+        for (ClassTableModel classTableModel : iska.findByResultado("Recurso")) {
             TextView newTextView = new TextView(getContext());
-            newTextView.setText("• "+classTableModel.getDisciplina());
-            newTextView.setTextColor(getContext().getResources().getColor(R.color.black));
+            newTextView.setText("• ".concat(classTableModel.getDisciplina()));
+            newTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.black));
             newTextView.setTextSize(18);
             linearLayoutRecursos.addView(newTextView);
         }
 
-        CardView cardViewCadeirasAtraso = view.findViewById(R.id.card_view_cadeiras);
-        viewGroup = (ViewGroup) cardViewCadeirasAtraso;
+        viewGroup = view.<CardView>findViewById(R.id.card_view_cadeiras_atraso);
         LinearLayout linearLayoutCadeirasAtraso = (LinearLayout) viewGroup.getChildAt(0);
 
-        for(ClassTableModel classTableModel : iska.findCadeirasAtraso()){
+        for (ClassTableModel classTableModel : iska.findCadeirasAtraso()) {
             TextView newTextView = new TextView(getContext());
-            newTextView.setText("• "+classTableModel.getDisciplina());
-            newTextView.setTextColor(getContext().getResources().getColor(R.color.black));
+            newTextView.setText("• ".concat(classTableModel.getDisciplina()));
+            newTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.black));
             newTextView.setTextSize(18);
             linearLayoutCadeirasAtraso.addView(newTextView);
         }
 
-        tvNomeEstudante.setText(iska.getHomeModel().getNomeEstudante());
-        tvNumeroAluno.setText(iska.getHomeModel().getNumeroAluno());
-        tvCurso.setText("Curso: "+iska.getHomeModel().getCurso());
-        tvTesouraria.setText("Tesouraria: "+iska.getHomeModel().getTesouraria());
-        tvAcademica.setText("Estado: "+iska.getHomeModel().getAcademica());
-        tvMatricula.setText(iska.getHomeModel().getMatricula());
-        tvLectivo.setText(iska.getHomeModel().getLectivo());
-        tvTelefone.setText("Telemóvel: "+iska.getHomeModel().getTelefone());
-        tvTelefone2.setText("Telemóvel (alternativo): "+iska.getHomeModel().getTelefone2());
-        tvEmail.setText("E-mail: "+iska.getHomeModel().getEmail());
+        String nome = iska.getHomeModel().getNomeEstudante();
+        String numero = iska.getHomeModel().getNumeroAluno();
+        String curso = "Curso: ".concat(iska.getHomeModel().getCurso());
+        String tesouraria = "Tesouraria: ".concat(iska.getHomeModel().getTesouraria());
+        String academica = "Estado: ".concat(iska.getHomeModel().getAcademica());
+        String matricula = iska.getHomeModel().getMatricula();
+        String lectivo = iska.getHomeModel().getLectivo();
+        String telefone = "Telemóvel: ".concat(iska.getHomeModel().getTelefone());
+        String telefone2 = "Telemóvel (alternativo): ".concat(iska.getHomeModel().getTelefone2());
+        String email = "E-mail: ".concat(iska.getHomeModel().getEmail());
+
+
+        tvNomeEstudante.setText(nome);
+        tvNumeroAluno.setText(numero);
+        tvCurso.setText(curso);
+        tvTesouraria.setText(tesouraria);
+        tvAcademica.setText(academica);
+        tvMatricula.setText(matricula);
+        tvLectivo.setText(lectivo);
+        tvTelefone.setText(telefone);
+        tvTelefone2.setText(telefone2);
+        tvEmail.setText(email);
         super.onViewCreated(view, savedInstanceState);
     }
 }

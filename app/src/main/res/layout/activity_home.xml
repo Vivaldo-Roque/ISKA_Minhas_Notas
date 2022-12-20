@@ -45,8 +45,8 @@
                     android:textSize="24sp"
                     android:textStyle="bold"
                     android:textColor="@color/black"
-                    android:layout_marginRight="?android:attr/actionBarSize"
-                    android:text="ISKA">
+                    android:layout_marginEnd="?android:attr/actionBarSize"
+                    android:text="@string/home_appbar_title">
 
                 </TextView>
 

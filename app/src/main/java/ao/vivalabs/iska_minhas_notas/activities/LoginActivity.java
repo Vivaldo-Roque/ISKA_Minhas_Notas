@@ -1,11 +1,14 @@
 package ao.vivalabs.iska_minhas_notas.activities;
 
-import android.app.ProgressDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Rect;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -20,19 +23,22 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import ao.vivalabs.iska_minhas_notas.R;
-import ao.vivalabs.iska_minhas_notas.scraping.IskaWebScrapingCallback;
 import ao.vivalabs.iska_minhas_notas.scraping.IskaWebScrapingTask;
 
-public class LoginActivity extends AppCompatActivity implements IskaWebScrapingCallback {
+public class LoginActivity extends AppCompatActivity {
 
     boolean isAllFieldsChecked;
-    ProgressDialog dialog;
+    Dialog dialog;
     EditText etNumeroEstudante;
     EditText etSenha;
     Button btnEntrar;
     TextView tvAlert;
-    IskaWebScrapingTask iskaTask;
+    ExecutorService iskaWebScraping = Executors.newSingleThreadExecutor();
+    Handler handler = new Handler(Looper.getMainLooper());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,8 +48,7 @@ public class LoginActivity extends AppCompatActivity implements IskaWebScrapingC
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null)
-        {
+        if (actionBar != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(false);
             getSupportActionBar().setHomeButtonEnabled(false);
         }
@@ -53,27 +58,36 @@ public class LoginActivity extends AppCompatActivity implements IskaWebScrapingC
         etSenha = findViewById(R.id.editTextSenha);
         btnEntrar = findViewById(R.id.buttonEntrar);
 
-        etNumeroEstudante.setText("190210");
-        etSenha.setText("006272580LA048");
+        String username = "190210";
+        String password = "006272580LA048";
+
+        etNumeroEstudante.setText(username);
+        etSenha.setText(password);
 
         etNumeroEstudante.setFocusableInTouchMode(true);
         etSenha.setFocusableInTouchMode(true);
 
-        btnEntrar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        btnEntrar.setOnClickListener(view -> {
 
-                isAllFieldsChecked = CheckAllFields();
-                if (isAllFieldsChecked) {
-                    btnEntrar.setEnabled(false);
-                    btnEntrar.setClickable(false);
-                    iskaTask = new IskaWebScrapingTask(
+            isAllFieldsChecked = CheckAllFields();
+            if (isAllFieldsChecked) {
+                btnEntrar.setEnabled(false);
+                btnEntrar.setClickable(false);
+
+                // BACKGROUND TASK START
+                preExe();
+                iskaWebScraping.execute(() -> {
+                    // Background
+                    new IskaWebScrapingTask(
                             etNumeroEstudante.getText().toString(),
                             etSenha.getText().toString(),
-                            LoginActivity.this
+                            (loggedIn, hasError) -> {
+                                // Post execute
+                                handler.post(() -> postExe(loggedIn, hasError));
+                            }
                     );
-                    iskaTask.execute();
-                }
+                });
+                // BACKGROUND TASK END
             }
         });
     }
@@ -159,31 +173,37 @@ public class LoginActivity extends AppCompatActivity implements IskaWebScrapingC
     }
 
     // Implementation of the callback interface
-    public void preExecute() {
+    public void preExe() {
         tvAlert.setVisibility(View.GONE);
-        dialog = new ProgressDialog(LoginActivity.this);
+        dialog = new Dialog(LoginActivity.this);
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+        }
+
+        dialog.setContentView(R.layout.loading_dialog);
         dialog.setCancelable(false);
         dialog.setCanceledOnTouchOutside(false);
-        dialog.setTitle("Verificando");
-        dialog.setMessage("Por favor aguarde...");
         dialog.show();
     }
 
-    public void postExecute(boolean loggedIn, boolean hasError) {
-        btnEntrar.setEnabled(true);
-        btnEntrar.setClickable(true);
+    public void postExe(boolean loggedIn, boolean hasError) {
         if (loggedIn && !hasError) {
             dialog.dismiss();
             Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
             startActivity(intent);
         } else if (!loggedIn && !hasError) {
-            tvAlert.setText("Não foi possível autenticar, por favor, tente novamente!");
+            String loginErrorMsg = "Não foi possível autenticar, por favor, tente novamente!";
+            tvAlert.setText(loginErrorMsg);
             tvAlert.setVisibility(View.VISIBLE);
             dialog.dismiss();
-        } else if (hasError) {
-            tvAlert.setText("Erro de conexão");
+        } else {
+            String netErrorMsg = "Erro de conexão";
+            tvAlert.setText(netErrorMsg);
             tvAlert.setVisibility(View.VISIBLE);
             dialog.dismiss();
         }
+        btnEntrar.setEnabled(true);
+        btnEntrar.setClickable(true);
     }
 }
