@@ -14,16 +14,17 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import ao.vivalabs.iska_minhas_notas.R;
+import ao.vivalabs.iska_minhas_notas.models.ClassTableModel;
 import ao.vivalabs.iska_minhas_notas.utils.Methods;
 
 public class ThreeLevelListAdapter extends BaseExpandableListAdapter {
 
-    String[] parentHeaders;
-    List<String[]> secondLevel;
-    List<LinkedHashMap<String, String[]>> data;
+    final String[] parentHeaders;
+    final List<String[]> secondLevel;
+    final List<LinkedHashMap<String, ClassTableModel[]>> data;
     private final Context context;
 
-    public ThreeLevelListAdapter(Context context, String[] parentHeader, List<String[]> secondLevel, List<LinkedHashMap<String, String[]>> data) {
+    public ThreeLevelListAdapter(Context context, String[] parentHeader, List<String[]> secondLevel, List<LinkedHashMap<String, ClassTableModel[]>> data) {
         this.context = context;
 
         this.parentHeaders = parentHeader;
@@ -97,8 +98,8 @@ public class ThreeLevelListAdapter extends BaseExpandableListAdapter {
         String[] headers = secondLevel.get(groupPosition);
 
 
-        List<String[]> childData = new ArrayList<>();
-        HashMap<String, String[]> secondLevelData = data.get(groupPosition);
+        List<ClassTableModel[]> childData = new ArrayList<>();
+        HashMap<String, ClassTableModel[]> secondLevelData = data.get(groupPosition);
 
         for (String key : secondLevelData.keySet()) {
 

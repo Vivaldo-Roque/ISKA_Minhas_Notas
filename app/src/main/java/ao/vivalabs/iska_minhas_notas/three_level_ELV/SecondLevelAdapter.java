@@ -15,17 +15,18 @@ import java.util.List;
 
 import ao.vivalabs.iska_minhas_notas.R;
 import ao.vivalabs.iska_minhas_notas.fragments.FragmentNotes;
+import ao.vivalabs.iska_minhas_notas.models.ClassTableModel;
 import ao.vivalabs.iska_minhas_notas.scraping.IskaWebScraping;
 import ao.vivalabs.iska_minhas_notas.utils.Methods;
 
 
 public class SecondLevelAdapter extends BaseExpandableListAdapter {
-    List<String[]> data;
-    String[] headers;
+    final List<ClassTableModel[]> data;
+    final String[] headers;
     private final Context context;
 
 
-    public SecondLevelAdapter(Context context, String[] headers, List<String[]> data) {
+    public SecondLevelAdapter(Context context, String[] headers, List<ClassTableModel[]> data) {
         this.context = context;
         this.data = data;
         this.headers = headers;
@@ -62,7 +63,7 @@ public class SecondLevelAdapter extends BaseExpandableListAdapter {
     @Override
     public Object getChild(int groupPosition, int childPosition) {
 
-        String[] childData;
+        ClassTableModel[] childData;
 
         childData = data.get(groupPosition);
 
@@ -82,9 +83,10 @@ public class SecondLevelAdapter extends BaseExpandableListAdapter {
 
         LinearLayout linearLayout = convertView.findViewById(R.id.rowThirdTextList);
 
-        String[] childArray = data.get(groupPosition);
+        ClassTableModel[] childArray = data.get(groupPosition);
 
-        String text = childArray[childPosition];
+        String text = childArray[childPosition].getDisciplina();
+        int id = childArray[childPosition].getId();
 
         TextView newTextView = new TextView(context);
         newTextView.setText(text);
@@ -93,7 +95,7 @@ public class SecondLevelAdapter extends BaseExpandableListAdapter {
         newTextView.setTextSize(20);
         newTextView.setOnClickListener(view -> {
             IskaWebScraping iska = IskaWebScraping.getInstance();
-            IskaWebScraping.getInstance().setDisciplina(iska.findByDiscipline(((TextView) view).getText().toString(), iska.getTablesMapList()));
+            IskaWebScraping.getInstance().setDisciplina(iska.findById(id, iska.getTablesMapList()));
             ((FragmentActivity) context).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new FragmentNotes(), "FRAG_NOTES").addToBackStack(null).commit();
         });
         linearLayout.addView(newTextView);
@@ -107,7 +109,7 @@ public class SecondLevelAdapter extends BaseExpandableListAdapter {
             return  0;
         }
 
-        String[] children = data.get(groupPosition);
+        ClassTableModel[] children = data.get(groupPosition);
         return children.length;
     }
 

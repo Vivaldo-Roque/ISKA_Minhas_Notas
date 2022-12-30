@@ -7,7 +7,26 @@ import java.util.Locale;
 import java.util.Objects;
 
 public class ClassTableModel implements Comparable<ClassTableModel> {
-    public ClassTableModel(String disciplina, String abreviatura, String ano, String turma, String tipo, String notaFinal, String avaliacaoContinua, String parcelar1, String parcelar2, String finalContinua, String resultado, String exame, String recurso, String epocaEspecial, String melhoria) {
+    private final int id;
+    private String abreviatura;
+    private String ano;
+    private final String disciplina;
+    private String turma;
+    private String tipo;
+    private String notaFinal;
+    private String avaliacaoContinua;
+    private String parcelar1;
+    private String parcelar2;
+    private String finalContinua;
+    private String resultado;
+    private String exame;
+    private String recurso;
+    private String epocaEspecial;
+    private String melhoria;
+    private int tableId;
+
+    public ClassTableModel(int id, String disciplina, String abreviatura, String ano, String turma, String tipo, String notaFinal, String avaliacaoContinua, String parcelar1, String parcelar2, String finalContinua, String resultado, String exame, String recurso, String epocaEspecial, String melhoria, int tableId) {
+        this.id = id;
         this.disciplina = disciplina;
         this.abreviatura = abreviatura;
         this.ano = ano;
@@ -23,23 +42,13 @@ public class ClassTableModel implements Comparable<ClassTableModel> {
         this.recurso = recurso;
         this.epocaEspecial = epocaEspecial;
         this.melhoria = melhoria;
+        this.tableId = tableId;
     }
 
-    private final String disciplina;
-    private final String abreviatura;
-    private final String ano;
-    private final String turma;
-    private final String tipo;
-    private final String notaFinal;
-    private final String avaliacaoContinua;
-    private final String parcelar1;
-    private final String parcelar2;
-    private final String finalContinua;
-    private final String resultado;
-    private final String exame;
-    private final String recurso;
-    private final String epocaEspecial;
-    private final String melhoria;
+    public ClassTableModel(int id, String disciplina) {
+        this.id = id;
+        this.disciplina = disciplina;
+    }
 
     public String getDisciplina() {
         return disciplina;
@@ -99,6 +108,19 @@ public class ClassTableModel implements Comparable<ClassTableModel> {
 
     public String getMelhoria() {
         return melhoria;
+    }
+
+    public int getTableId() {
+        return tableId;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public boolean todosCamposVazios() {
+        String vazio = "-";
+        return (getNotaFinal().equals(vazio) && getAvaliacaoContinua().equals(vazio) && getParcelar1().equals(vazio) && getParcelar2().equals(vazio) && getFinalContinua().equals(vazio) && getResultado().equals(vazio) && getExame().equals(vazio) && getRecurso().equals(vazio) && getEpocaEspecial().equals(vazio) && getMelhoria().equals(vazio));
     }
 
     @Override

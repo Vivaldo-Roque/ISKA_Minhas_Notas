@@ -1,5 +1,7 @@
 package ao.vivalabs.iska_minhas_notas.utils;
 
+import static ao.vivalabs.iska_minhas_notas.utils.Methods.isNumeric;
+
 import android.content.Context;
 import android.os.Environment;
 import android.print.PdfConverter;
@@ -227,7 +229,7 @@ public class ConvertToTable {
         }
 
         /* Add remaining Table Data */
-        for (int rowIndex = 0; rowIndex < 50; rowIndex++) // we have to populate 50 rows
+        for (int rowIndex = 0; rowIndex <= my_data_range_2_row_end; rowIndex++) // we have to populate 50 rows
         {
             /* Create a Row */
             XSSFRow row = sheet2.createRow(rowIndex);
@@ -432,18 +434,6 @@ public class ConvertToTable {
         converter.convert(context, finalString, file);
 
         Log.d(TAG, "ISKA ==> " + String.format("%s_", homeModel.getNumeroAluno().replaceAll("[^0-9]", "")) + fileName + " written successfully");
-    }
-
-    public boolean isNumeric(String strNum) {
-        if (strNum == null) {
-            return false;
-        }
-        try {
-            Double.parseDouble(strNum);
-        } catch (NumberFormatException nfe) {
-            return false;
-        }
-        return true;
     }
 
     public Integer getMaxTextSizeColumnCell(XSSFSheet sheet, int columnNumber) {

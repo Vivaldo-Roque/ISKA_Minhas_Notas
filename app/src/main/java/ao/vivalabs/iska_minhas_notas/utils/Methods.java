@@ -10,7 +10,7 @@ import android.content.Context;
 /**
  * Converts Dp to Px.
  * <p>
- * Converts Sp to Px
+ * Check if string is number
  */
 
 public class Methods {
@@ -21,8 +21,15 @@ public class Methods {
         return Math.round(dp * density);
     }
 
-    public static int spToPx(Context context, float sp) {
-        float scaleDensity = context.getResources().getDisplayMetrics().scaledDensity;
-        return Math.round(sp * scaleDensity);
+    public static boolean isNumeric(String strNum) {
+        if (strNum == null) {
+            return false;
+        }
+        try {
+            Double.parseDouble(strNum);
+        } catch (NumberFormatException nfe) {
+            return false;
+        }
+        return true;
     }
 }

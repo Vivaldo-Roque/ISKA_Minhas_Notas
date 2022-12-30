@@ -2,18 +2,22 @@ package ao.vivalabs.iska_minhas_notas.activities;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.DocumentsContract;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -25,12 +29,14 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.FileProvider;
 import androidx.core.view.GravityCompat;
 import androidx.core.view.MenuCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.navigation.NavigationView;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,6 +45,7 @@ import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import ao.vivalabs.iska_minhas_notas.BuildConfig;
 import ao.vivalabs.iska_minhas_notas.R;
 import ao.vivalabs.iska_minhas_notas.fragments.FragmentAbout;
 import ao.vivalabs.iska_minhas_notas.fragments.FragmentChooseYearPeriodDiscipline;
@@ -56,6 +63,8 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     private final String[] permissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE};
     boolean doubleBackToExitPressedOnce = false;
     MenuItem nav_exportar;
+    Dialog dialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,7 +89,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         toggle.syncState();
 
         if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new FragmentHome()).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new FragmentHome(), "FLAG_HOME").commit();
             navigationView.setCheckedItem(R.id.nav_home);
         }
 
@@ -116,22 +125,30 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new FragmentAbout(), "FRAG_ABOUT").commit();
         }
 
+        FragmentChooseYearPeriodDiscipline fragmentChooseYearPeriodDiscipline = (FragmentChooseYearPeriodDiscipline) getSupportFragmentManager().findFragmentByTag("FRAG_SELECT");
+
+        if (fragmentChooseYearPeriodDiscipline != null) {
+            getSupportFragmentManager().beginTransaction().remove(fragmentChooseYearPeriodDiscipline).commit();
+        }
+
         return true;
     }
 
     @Override
     public void onBackPressed() {
 
+        FragmentHome fragmentHome = (FragmentHome) getSupportFragmentManager().findFragmentByTag("FRAG_HOME");
         FragmentChooseYearPeriodDiscipline fragmentChooseYearPeriodDiscipline = (FragmentChooseYearPeriodDiscipline) getSupportFragmentManager().findFragmentByTag("FRAG_SELECT");
         FragmentAbout fragmentAbout = (FragmentAbout) getSupportFragmentManager().findFragmentByTag("FRAG_ABOUT");
+        // FragmentNotes fragmentNotes = (FragmentNotes) getSupportFragmentManager().findFragmentByTag("FRAG_NOTES");
 
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-        } else if (fragmentChooseYearPeriodDiscipline != null && fragmentChooseYearPeriodDiscipline.isVisible()) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new FragmentHome()).commit();
-        } else if (fragmentAbout != null && fragmentAbout.isVisible()) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new FragmentHome()).commit();
-        } else {
+        } else if (fragmentChooseYearPeriodDiscipline != null && fragmentChooseYearPeriodDiscipline.isResumed()) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new FragmentHome(), "FRAG_HOME").commit();
+        } else if (fragmentAbout != null && fragmentAbout.isResumed()) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new FragmentHome(), "FRAG_HOME").commit();
+        } else if (fragmentHome != null && fragmentHome.isResumed()) {
             if (doubleBackToExitPressedOnce) {
                 super.onBackPressed();
             } else {
@@ -139,6 +156,8 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                 Toast.makeText(this, "Clique 2 vezes em VOLTAR para sair", Toast.LENGTH_SHORT).show();
                 new Handler(Looper.getMainLooper()).postDelayed(() -> doubleBackToExitPressedOnce = false, 2000);
             }
+        } else {
+            super.onBackPressed();
         }
     }
 
@@ -152,8 +171,20 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
         if (permissions_granted) {
 
+            // Pre execute
+            dialog = new Dialog(HomeActivity.this);
+
+            if (dialog.getWindow() != null) {
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+            }
+
+            dialog.setContentView(R.layout.loading_dialog);
+            dialog.setCancelable(false);
+            dialog.setCanceledOnTouchOutside(false);
+            dialog.show();
             nav_exportar.setEnabled(false);
             convertTask.execute(() -> {
+                // Background
                 try {
                     convert.convertToExcel("ISKA_NOTAS.xlsx", IskaWebScraping.getInstance().getHomeModel(), IskaWebScraping.getInstance().getTablesMapList());
                 } catch (Exception e) {
@@ -167,7 +198,9 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                 }
 
                 handler.post(() -> {
-                    String msg = "2 ficheiros (Excel e Pdf) foram salvo em\n \"/Download/ISKA\"";
+                    // Post execute
+                    dialog.dismiss();
+                    String msg = "2 ficheiros (Excel e Pdf) foram salvos em\n \"/Download/ISKA\"";
                     dialogMsg(msg);
                     nav_exportar.setEnabled(true);
                 });
@@ -236,7 +269,26 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     private void dialogMsg(String msg) {
         new AlertDialog.Builder(this).setTitle("Exportar").setMessage(msg)
                 .setCancelable(false)
-                .setPositiveButton("Fechar", (dialog, which) -> dialog.dismiss()).show();
+                .setNegativeButton("Abrir pasta", (dialog, which) -> {
+                    File downloadFolder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + File.separator + "ISKA");
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+
+                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    Uri uri = FileProvider.getUriForFile(Objects.requireNonNull(getApplicationContext()), BuildConfig.APPLICATION_ID + ".provider", downloadFolder);
+
+                    intent.setDataAndType(uri, DocumentsContract.Document.MIME_TYPE_DIR);
+
+                    try {
+                        startActivity(intent);
+                    } catch (Exception ActivityNotFoundException) {
+                        Toast toast = Toast.makeText(HomeActivity.this, "Instale uma aplicação para ler ficheiros", Toast.LENGTH_SHORT);
+                        toast.setGravity(Gravity.CENTER, 0, 0);
+                        toast.show();
+                    }
+                })
+                .setPositiveButton("Fechar", (dialog, which) -> dialog.dismiss())
+                .show();
     }
 
     private void showRational(String title, String msg) {

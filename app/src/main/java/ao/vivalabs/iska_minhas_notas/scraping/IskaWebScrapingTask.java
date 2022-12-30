@@ -105,24 +105,27 @@ public class IskaWebScrapingTask {
                         .get();
 
                 // get tables
-                Elements classificacaoTable = doc.select(cssPathToTable);
+                Elements classificacaoTables = doc.select(cssPathToTable);
 
-                // get table headers
-                Element tableHeader = classificacaoTable.select("tr").first();
+                // get table header
+                Element tableHeader = classificacaoTables.select("tr").first();
 
                 // save cells to hasMap
                 List<ClassTableModel> tablesMapList = new ArrayList<>();
-                for(Element table: classificacaoTable.select("tbody")){
+                int totalElements = classificacaoTables.size();
+                int id = 0;
+                for (Element table : classificacaoTables.select("tbody")) {
                     Elements tempRows = table.select("tr");
-                    for(int i = 0; i < tempRows.size(); i++){
+                    for (int i = 0; i < tempRows.size(); i++) {
                         Map<String, String> tableMap = new HashMap<>();
                         Elements tempCols = tempRows.get(i).select("td");
-                        for(int j = 0; j < tempCols.size(); j++){
+                        for (int j = 0; j < tempCols.size(); j++) {
                             assert tableHeader != null;
                             tableMap.put(tableHeader.child(j).text(), tempCols.get(j).text());
                         }
-
+                        id++;
                         tablesMapList.add(new ClassTableModel(
+                                id,
                                 tableMap.get("Disciplina"),
                                 tableMap.get("Abrev."),
                                 tableMap.get("Ano"),
@@ -137,9 +140,12 @@ public class IskaWebScrapingTask {
                                 tableMap.get("Exame"),
                                 tableMap.get("Recurso"),
                                 tableMap.get("Ép. Espec."),
-                                tableMap.get("Melhoria")
-                        ));
+                                tableMap.get("Melhoria"),
+                                totalElements));
                     }
+
+                    totalElements--;
+
                 }
                 IskaWebScraping.getInstance().SetIskaWebScraping(homeModel, tablesMapList);
             }

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import ao.vivalabs.iska_minhas_notas.models.ClassTableModel;
 import ao.vivalabs.iska_minhas_notas.models.HomeModel;
@@ -86,22 +85,20 @@ public class IskaWebScraping {
             }
         }
 
-        //Removing Duplicates;
-        Set<ClassTableModel> s = new HashSet<>(res);
-        res = new ArrayList<>(s);
-        //Now the List has only the identical Elements
-
-        Collections.sort(res);
-
         return res;
     }
 
-    public List<ClassTableModel> findCadeirasAtraso() {
+    public List<ClassTableModel> findCadeirasAtraso(List<ClassTableModel> classTableModelList) {
         List<ClassTableModel> res = new ArrayList<>();
-        String year = getHomeModel().getMatricula().replaceAll("[^0-9]", "");
-        for (ClassTableModel classTableModel : getTablesMapList()) {
-            if (!classTableModel.getAno().equals(year)) {
-                if(!classTableModel.getNotaFinal().equals("-")){
+        // int currentYear = Integer.parseInt(getHomeModel().getMatricula().replaceAll("[^0-9]", ""));
+        for (ClassTableModel classTableModel : classTableModelList) {
+            int year = classTableModel.getTableId();
+            int tempYear = Integer.parseInt(classTableModel.getAno().replaceAll("[^0-9]", ""));
+
+            if (tempYear != year) {
+                if (classTableModel.todosCamposVazios()) {
+                    res.add(classTableModel);
+                } else if (!classTableModel.getNotaFinal().equals("-")) {
                     int nota = Integer.parseInt(classTableModel.getNotaFinal());
                     if (nota < 10) {
                         res.add(classTableModel);
@@ -160,6 +157,17 @@ public class IskaWebScraping {
 
         for (ClassTableModel classTableModel : classTableModels) {
             if (classTableModel.getDisciplina().equals(discipline)) {
+                return classTableModel;
+            }
+        }
+
+        return null;
+    }
+
+    public ClassTableModel findById(int id, List<ClassTableModel> classTableModels) {
+
+        for (ClassTableModel classTableModel : classTableModels) {
+            if (classTableModel.getId() == id) {
                 return classTableModel;
             }
         }

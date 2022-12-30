@@ -25,7 +25,19 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ISKA_Minhas_Notas"
         android:usesCleartextTraffic="true"
+        android:windowSoftInputMode="stateAlwaysHidden"
         tools:targetApi="33">
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths" />
+        </provider>
+
         <activity
             android:name=".activities.LoginActivity"
             android:exported="true"

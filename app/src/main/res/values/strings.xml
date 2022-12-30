@@ -37,4 +37,11 @@
     <string name="home_menu_notas">Notas</string>
     <string name="home_menu_exportar_dados">Exportar dados</string>
     <string name="home_menu_about">Acerca da aplicação</string>
+    <string name="simulador_de_m_dia">Simulador de média</string>
+    <string name="a_c">A.C.</string>
+    <string name="plus">+</string>
+    <string name="_1_p">1ª.P.</string>
+    <string name="_2_p">2ª.P.</string>
+    <string name="equal">=</string>
+    <string name="f_c">F.C.</string>
 </resources>

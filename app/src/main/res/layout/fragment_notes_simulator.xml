@@ -1,0 +1,182 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <TextView
+        android:id="@+id/textView21"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/simulador_de_m_dia"
+        android:textColor="@color/black"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="@android:color/darker_gray" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/a_c"
+                android:textAlignment="center"
+                android:textSize="18sp"
+                android:textStyle="bold"></TextView>
+
+            <EditText
+                android:id="@+id/valor_1"
+                android:layout_width="55dp"
+                android:layout_height="match_parent"
+                android:autofillHints=""
+                android:background="@drawable/ic_edit_text_rounded_black"
+                android:inputType="numberDecimal"
+                android:textAlignment="center"
+                android:textSize="18sp"
+                tools:ignore="LabelFor"></EditText>
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginRight="10dp"
+            android:text="@string/plus"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:textSize="25sp"
+            android:textStyle="bold">
+
+        </TextView>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/_1_p"
+                android:textAlignment="center"
+                android:textSize="18sp"
+                android:textStyle="bold"></TextView>
+
+            <EditText
+                android:id="@+id/valor_2"
+                android:layout_width="55dp"
+                android:layout_height="match_parent"
+                android:autofillHints=""
+                android:background="@drawable/ic_edit_text_rounded_black"
+                android:inputType="numberDecimal"
+                android:textAlignment="center"
+                android:textSize="18sp"
+                tools:ignore="LabelFor"></EditText>
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginRight="10dp"
+            android:text="@string/plus"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:textSize="25sp"
+            android:textStyle="bold">
+
+        </TextView>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/_2_p"
+                android:textAlignment="center"
+                android:textSize="18sp"
+                android:textStyle="bold"></TextView>
+
+            <EditText
+                android:id="@+id/valor_3"
+                android:layout_width="55dp"
+                android:layout_height="match_parent"
+                android:autofillHints=""
+                android:background="@drawable/ic_edit_text_rounded_black"
+                android:inputType="numberDecimal"
+                android:textAlignment="center"
+                android:textSize="18sp"
+                tools:ignore="LabelFor"></EditText>
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginRight="10dp"
+            android:text="@string/equal"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:textSize="30sp"
+            android:textStyle="bold">
+
+        </TextView>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/f_c"
+                android:textAlignment="center"
+                android:textSize="18sp"
+                android:textStyle="bold"></TextView>
+
+            <EditText
+                android:id="@+id/valor_4"
+                android:layout_width="55dp"
+                android:layout_height="match_parent"
+                android:autofillHints=""
+                android:background="@drawable/ic_edit_text_rounded_black"
+                android:inputType="numberDecimal"
+                android:textAlignment="center"
+                android:textSize="18sp"
+                tools:ignore="LabelFor"></EditText>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

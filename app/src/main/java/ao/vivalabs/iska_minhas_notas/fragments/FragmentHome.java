@@ -77,7 +77,7 @@ public class FragmentHome extends Fragment {
         viewGroup = view.<CardView>findViewById(R.id.card_view_cadeiras_atraso);
         LinearLayout linearLayoutCadeirasAtraso = (LinearLayout) viewGroup.getChildAt(0);
 
-        for (ClassTableModel classTableModel : iska.findCadeirasAtraso()) {
+        for (ClassTableModel classTableModel : iska.findCadeirasAtraso(iska.getTablesMapList())) {
             TextView newTextView = new TextView(getContext());
             newTextView.setText("• ".concat(classTableModel.getDisciplina()));
             newTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.black));
