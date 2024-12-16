@@ -33,13 +33,16 @@ import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTTableStyleInfo;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
-import ao.vivalabs.iska_minhas_notas.models.ClassTableModel;
 import ao.vivalabs.iska_minhas_notas.models.HomeModel;
+import ao.vivalabs.iska_minhas_notas.models.TableModel;
 
 public class ConvertToTable {
 
@@ -58,7 +61,7 @@ public class ConvertToTable {
         }
     }
 
-    public void convertToExcel(String fileName, HomeModel homeModel, List<ClassTableModel> classificationList) throws Exception {
+    public void convertToExcel(String fileName, HomeModel homeModel, List<TableModel> classificationList) throws Exception {
         List<String> sheet1HeadersNames = Arrays.asList(
                 "Número de estudante",
                 "Nome estudante",
@@ -413,15 +416,19 @@ public class ConvertToTable {
         Log.d(TAG, "ISKA ==> " + String.format("%s_", homeModel.getNumeroAluno().replaceAll("[^0-9]", "")) + fileName + " written successfully");
     }
 
-    public void convertToPdf(String fileName, Context context, HomeModel homeModel, List<ClassTableModel> classificationList) {
+    public void convertToPdf(String fileName, Context context, HomeModel homeModel, List<TableModel> classificationList) {
 
         final String html_body = "<html><head> <style> #notes { font-family: Arial, Helvetica, sans-serif; border-collapse: collapse; width: 100%; text-align: center; } #notes td, #notes th { border: 1px solid #ddd; padding: 8px 12px 8px 12px; border: none; } #notes tr:nth-child(odd) { /* background-color: #fce4d6; */ background-color: #f8cbad; } #notes tr:nth-child(even) { background-color: #fce4d6; } #notes th { padding-top: 12px; padding-bottom: 12px; background-color: #ed7d31; color: black; } </style></head><body>";
-        final String student_div = String.format("<div><p><strong>Número estudante:</strong> %s</p><p><strong>Nome:</strong> %s</p><p><strong>Curso:</strong> %s</p><p><strong>Instituto do Ensino Superior:</strong> ISKA</p></div>", homeModel.getNumeroAluno().replaceAll("[^0-9]", ""), homeModel.getNomeEstudante(), homeModel.getCurso());
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy 'às' HH:mm:ss", Locale.forLanguageTag("pt_BR"));
+        String currentDateandTime = sdf.format(new Date());
+
+        final String student_div = String.format("<div><p><strong>Número estudante:</strong> %s</p><p><strong>Nome:</strong> %s</p><p><strong>Curso:</strong> %s</p><p><strong>Instituto do Ensino Superior:</strong> ISKA</p><p><strong>Gerado em:</strong> %s</p></div>", homeModel.getNumeroAluno().replaceAll("[^0-9]", ""), homeModel.getNomeEstudante(), homeModel.getCurso(), currentDateandTime);
         final String table_tbody = "<table id=\"notes\"> <thead> <tr> <th> Disciplina </th> <th> Abrev. </th> <th> Ano </th> <th> Turma </th> <th> Tipo </th> <th> Nota Final </th> <th> A. C. </th> <th> Final Contínua </th> <th> 1º P. </th> <th> 2º P. </th> <th> Resultado </th> <th> Exame </th> <th> Recurso </th> <th> Ép. Espec. </th> <th> Melhoria </th> </tr> </thead> <tbody>";
 
         StringBuilder tbody_trs = new StringBuilder();
 
-        for (ClassTableModel c : classificationList) {
+        for (TableModel c : classificationList) {
             tbody_trs.append(String.format("<tr> <td>%s</td> <td>%s</td> <td>%s</td> <td>%s</td> <td>%s</td> <td>%s</td> <td>%s</td> <td>%s</td> <td>%s</td> <td>%s</td> <td>%s</td> <td>%s</td> <td>%s</td> <td>%s</td> <td>%s</td> </tr>", c.getDisciplina(), c.getAbreviatura(), c.getAno(), c.getTurma(), c.getTipo(), c.getNotaFinal(), c.getAvaliacaoContinua(), c.getFinalContinua(), c.getParcelar1(), c.getParcelar2(), c.getResultado(), c.getExame(), c.getRecurso(), c.getEpocaEspecial(), c.getMelhoria()));
         }
 

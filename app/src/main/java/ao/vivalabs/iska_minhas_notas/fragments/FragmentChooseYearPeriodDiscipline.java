@@ -16,7 +16,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import ao.vivalabs.iska_minhas_notas.R;
-import ao.vivalabs.iska_minhas_notas.models.ClassTableModel;
+import ao.vivalabs.iska_minhas_notas.models.TableModel;
 import ao.vivalabs.iska_minhas_notas.scraping.IskaWebScraping;
 import ao.vivalabs.iska_minhas_notas.three_level_ELV.ThreeLevelListAdapter;
 import ao.vivalabs.iska_minhas_notas.utils.Methods;
@@ -36,8 +36,10 @@ public class FragmentChooseYearPeriodDiscipline extends Fragment {
     /**
      * Inner level data
      */
-    final List<LinkedHashMap<String, ClassTableModel[]>> data = new ArrayList<>();
+    final List<LinkedHashMap<String, TableModel[]>> data = new ArrayList<>();
     private ExpandableListView expandableListView;
+
+    private ThreeLevelListAdapter threeLevelListAdapterAdapter;
 
     IskaWebScraping iska;
 
@@ -66,92 +68,92 @@ public class FragmentChooseYearPeriodDiscipline extends Fragment {
         secondLevel.add(periodos);
         secondLevel.add(periodos);
 
-        List<ClassTableModel> todasCadeiras = iska.getTablesMapList();
+        List<TableModel> todasCadeiras = iska.getTablesMapList();
 
         for (String year : parent) {
-            LinkedHashMap<String, ClassTableModel[]> thirdLevelPeriodo = new LinkedHashMap<>();
-            List<ClassTableModel> currentYear = iska.findAllByYear(year.replace(" Ano", ""), todasCadeiras);
+            LinkedHashMap<String, TableModel[]> thirdLevelPeriodo = new LinkedHashMap<>();
+            List<TableModel> currentYear = iska.findAllByYear(year.replace(" Ano", ""), todasCadeiras);
 
             if (!currentYear.isEmpty()) {
-                List<ClassTableModel> simeste1 = iska.findAllByPeriod("1º Semestre", currentYear);
-                List<ClassTableModel> simeste2 = iska.findAllByPeriod("2º Semestre", currentYear);
-                List<ClassTableModel> anual = iska.findAllByPeriod("Anual", currentYear);
+                List<TableModel> simeste1 = iska.findAllByPeriod("1º Semestre", currentYear);
+                List<TableModel> simeste2 = iska.findAllByPeriod("2º Semestre", currentYear);
+                List<TableModel> anual = iska.findAllByPeriod("Anual", currentYear);
 
-                List<ClassTableModel> cadeiras = new ArrayList<>();
+                List<TableModel> cadeiras = new ArrayList<>();
 
                 if (!simeste1.isEmpty()) {
 
-                    for (ClassTableModel cadeira : simeste1) {
+                    for (TableModel cadeira : simeste1) {
                         int tempCurrentYear = cadeira.getTableId();
-                        int tempYear = Integer.parseInt(cadeira.getAno().replaceAll("[^0-9]", ""));
+                        int tempYear = Integer.parseInt(cadeira.getAno().replaceAll("\\D", ""));
 
                         if (tempYear != tempCurrentYear) {
                             if (cadeira.todosCamposVazios()) {
-                                cadeiras.add(new ClassTableModel(cadeira.getId(), cadeira.getDisciplina() + " - Atraso"));
+                                cadeiras.add(new TableModel(cadeira.getId(), cadeira.getDisciplina() + " - Atraso"));
                             }
                         } else if (!cadeira.getNotaFinal().equals("-")) {
                             int nota = Integer.parseInt(cadeira.getNotaFinal());
                             if (nota >= 10) {
-                                cadeiras.add(new ClassTableModel(cadeira.getId(), cadeira.getDisciplina()));
+                                cadeiras.add(new TableModel(cadeira.getId(), cadeira.getDisciplina()));
                             } else {
-                                cadeiras.add(new ClassTableModel(cadeira.getId(), cadeira.getDisciplina() + " - Atraso"));
+                                cadeiras.add(new TableModel(cadeira.getId(), cadeira.getDisciplina() + " - Atraso"));
                             }
                         } else {
-                            cadeiras.add(new ClassTableModel(cadeira.getId(), cadeira.getDisciplina()));
+                            cadeiras.add(new TableModel(cadeira.getId(), cadeira.getDisciplina()));
                         }
                     }
-                    thirdLevelPeriodo.put(periodos[0], cadeiras.toArray(new ClassTableModel[0]));
+                    thirdLevelPeriodo.put(periodos[0], cadeiras.toArray(new TableModel[0]));
                     cadeiras = new ArrayList<>();
                 }
 
                 if(!simeste2.isEmpty()) {
 
-                    for (ClassTableModel cadeira : simeste2) {
+                    for (TableModel cadeira : simeste2) {
 
                         int tempCurrentYear = cadeira.getTableId();
-                        int tempYear = Integer.parseInt(cadeira.getAno().replaceAll("[^0-9]", ""));
+                        int tempYear = Integer.parseInt(cadeira.getAno().replaceAll("\\D", ""));
 
                         if (tempYear != tempCurrentYear) {
                             if (cadeira.todosCamposVazios()) {
-                                cadeiras.add(new ClassTableModel(cadeira.getId(), cadeira.getDisciplina() + " - Atraso"));
+                                cadeiras.add(new TableModel(cadeira.getId(), cadeira.getDisciplina() + " - Atraso"));
                             }
                         } else if (!cadeira.getNotaFinal().equals("-")) {
                             int nota = Integer.parseInt(cadeira.getNotaFinal());
                             if (nota >= 10) {
-                                cadeiras.add(new ClassTableModel(cadeira.getId(), cadeira.getDisciplina()));
+                                cadeiras.add(new TableModel(cadeira.getId(), cadeira.getDisciplina()));
                             } else {
-                                cadeiras.add(new ClassTableModel(cadeira.getId(), cadeira.getDisciplina() + " - Atraso"));
+                                cadeiras.add(new TableModel(cadeira.getId(), cadeira.getDisciplina() + " - Atraso"));
                             }
                         } else {
-                            cadeiras.add(new ClassTableModel(cadeira.getId(), cadeira.getDisciplina()));
+                            cadeiras.add(new TableModel(cadeira.getId(), cadeira.getDisciplina()));
                         }
                     }
-                    thirdLevelPeriodo.put(periodos[1], cadeiras.toArray(new ClassTableModel[0]));
+                    thirdLevelPeriodo.put(periodos[1], cadeiras.toArray(new TableModel[0]));
                     cadeiras = new ArrayList<>();
                 }
 
                 if(!anual.isEmpty()) {
 
-                    for (ClassTableModel cadeira : anual) {
+                    for (TableModel cadeira : anual) {
                         int tempCurrentYear = cadeira.getTableId();
-                        int tempYear = Integer.parseInt(cadeira.getAno().replaceAll("[^0-9]", ""));
+                        int tempYear = Integer.parseInt(cadeira.getAno().replaceAll("\\D", ""));
 
                         if (tempYear != tempCurrentYear) {
                             if (cadeira.todosCamposVazios()) {
-                                cadeiras.add(new ClassTableModel(cadeira.getId(), cadeira.getDisciplina() + " - Atraso"));
+                                cadeiras.add(new TableModel(cadeira.getId(), cadeira.getDisciplina() + " - Atraso"));
                             }
                         } else if (!cadeira.getNotaFinal().equals("-")) {
                             int nota = Integer.parseInt(cadeira.getNotaFinal());
                             if (nota >= 10) {
-                                cadeiras.add(new ClassTableModel(cadeira.getId(), cadeira.getDisciplina()));
+                                cadeiras.add(new TableModel(cadeira.getId(), cadeira.getDisciplina()));
                             } else {
-                                cadeiras.add(new ClassTableModel(cadeira.getId(), cadeira.getDisciplina() + " - Atraso"));
+                                cadeiras.add(new TableModel(cadeira.getId(), cadeira.getDisciplina() + " - Atraso"));
                             }
                         } else {
-                            cadeiras.add(new ClassTableModel(cadeira.getId(), cadeira.getDisciplina()));
+                            cadeiras.add(new TableModel(cadeira.getId(), cadeira.getDisciplina()));
                         }
                     }
-                    thirdLevelPeriodo.put(periodos[2], cadeiras.toArray(new ClassTableModel[0]));
+                    thirdLevelPeriodo.put(periodos[2], cadeiras.toArray(new TableModel[0]));
                 }
 
             }
@@ -161,7 +163,7 @@ public class FragmentChooseYearPeriodDiscipline extends Fragment {
 
         expandableListView = view.findViewById(R.id.exp_list_view_year);
         //passing three level of information to constructor
-        ThreeLevelListAdapter threeLevelListAdapterAdapter = new ThreeLevelListAdapter(this.getContext(), parent, secondLevel, data);
+        threeLevelListAdapterAdapter = new ThreeLevelListAdapter(this.getContext(), parent, secondLevel, data);
         expandableListView.setAdapter(threeLevelListAdapterAdapter);
         expandableListView.setDividerHeight(Methods.dpToPx(mContext, 1f));
         expandableListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
@@ -180,5 +182,12 @@ public class FragmentChooseYearPeriodDiscipline extends Fragment {
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         mContext = context;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        expandableListView = null;
+        threeLevelListAdapterAdapter = null;
     }
 }

@@ -62,7 +62,7 @@ public class LoginActivity extends AppCompatActivity {
         ScrollView scrollView = findViewById(R.id.scrollView1);
         scrollView.post(() -> scrollView.fullScroll(ScrollView.FOCUS_DOWN));
 
-        
+
         etNumeroEstudante.clearFocus();
 
         btnEntrar.setOnClickListener(view -> {

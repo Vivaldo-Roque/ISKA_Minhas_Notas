@@ -15,18 +15,18 @@ import java.util.List;
 
 import ao.vivalabs.iska_minhas_notas.R;
 import ao.vivalabs.iska_minhas_notas.fragments.FragmentNotes;
-import ao.vivalabs.iska_minhas_notas.models.ClassTableModel;
+import ao.vivalabs.iska_minhas_notas.models.TableModel;
 import ao.vivalabs.iska_minhas_notas.scraping.IskaWebScraping;
 import ao.vivalabs.iska_minhas_notas.utils.Methods;
 
 
 public class SecondLevelAdapter extends BaseExpandableListAdapter {
-    final List<ClassTableModel[]> data;
+    final List<TableModel[]> data;
     final String[] headers;
     private final Context context;
 
 
-    public SecondLevelAdapter(Context context, String[] headers, List<ClassTableModel[]> data) {
+    public SecondLevelAdapter(Context context, String[] headers, List<TableModel[]> data) {
         this.context = context;
         this.data = data;
         this.headers = headers;
@@ -63,7 +63,7 @@ public class SecondLevelAdapter extends BaseExpandableListAdapter {
     @Override
     public Object getChild(int groupPosition, int childPosition) {
 
-        ClassTableModel[] childData;
+        TableModel[] childData;
 
         childData = data.get(groupPosition);
 
@@ -83,7 +83,7 @@ public class SecondLevelAdapter extends BaseExpandableListAdapter {
 
         LinearLayout linearLayout = convertView.findViewById(R.id.rowThirdTextList);
 
-        ClassTableModel[] childArray = data.get(groupPosition);
+        TableModel[] childArray = data.get(groupPosition);
 
         String text = childArray[childPosition].getDisciplina();
         int id = childArray[childPosition].getId();
@@ -109,7 +109,7 @@ public class SecondLevelAdapter extends BaseExpandableListAdapter {
             return  0;
         }
 
-        ClassTableModel[] children = data.get(groupPosition);
+        TableModel[] children = data.get(groupPosition);
         return children.length;
     }
 

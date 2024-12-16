@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -25,6 +26,7 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -53,6 +55,7 @@ import ao.vivalabs.iska_minhas_notas.fragments.FragmentHome;
 import ao.vivalabs.iska_minhas_notas.scraping.IskaWebScraping;
 import ao.vivalabs.iska_minhas_notas.utils.ConvertToTable;
 
+@RequiresApi(api = Build.VERSION_CODES.Q)
 public class HomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private final int REQUEST_ID_MULTIPLE_PERMISSIONS = 1;
@@ -60,7 +63,13 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     private DrawerLayout drawer;
     NavigationView navigationView;
     private ConvertToTable convert;
-    private final String[] permissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE};
+
+    // Definição das permissões requeridas, incluindo permissões específicas para Android 10+ e 14+
+    private final String[] permissions = {
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.ACCESS_MEDIA_LOCATION
+    };
     boolean doubleBackToExitPressedOnce = false;
     MenuItem nav_exportar;
     Dialog dialog;
@@ -70,30 +79,88 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+        // Check and request permissions when the activity starts
         permissions_granted = checkAndRequestPermissions();
 
+        // Toolbar and Navigation Drawer Setup
+        setupUI(savedInstanceState);
+
+        convert = new ConvertToTable();
+    }    // Lançador de resultado para gerenciar permissões de arquivos
+    private final ActivityResultLauncher<Intent> storageActivityResultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    if (!Environment.isExternalStorageManager()) {
+                        showRationaleDialog(
+                                "Permissão de armazenamento necessária",
+                                "Sem essa permissão, não será possível salvar arquivos.",
+                                (dialog, which) -> requestManageAllFilesAccess()
+                        );
+                    }
+                }
+            }
+    );
+
+    private void setupUI(Bundle savedInstanceState) {
         Toolbar toolbar = findViewById(R.id.toolbar);
         // setSupportActionBar(toolbar);
 
         drawer = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
+
         Menu menuNav = navigationView.getMenu();
         nav_exportar = menuNav.findItem(R.id.nav_exportar);
 
         navigationView.setNavigationItemSelectedListener(this);
-
         MenuCompat.setGroupDividerEnabled(navigationView.getMenu(), true);
 
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar,
+                R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
         if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new FragmentHome(), "FLAG_HOME").commit();
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, new FragmentHome(), "FLAG_HOME").commit();
             navigationView.setCheckedItem(R.id.nav_home);
         }
+    }
 
-        convert = new ConvertToTable();
+    // Solicita acesso total a arquivos no Android 11+ (Scoped Storage)
+    @RequiresApi(api = Build.VERSION_CODES.R)
+    private void requestManageAllFilesAccess() {
+        try {
+            Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+            intent.setData(Uri.fromParts("package", this.getPackageName(), null));
+            storageActivityResultLauncher.launch(intent);
+        } catch (Exception e) {
+            Toast.makeText(this, "Erro ao abrir configurações de permissões.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    // Metodo principal para verificar e solicitar permissões
+    private boolean checkAndRequestPermissions() {
+        List<String> listPermissionsNeeded = new ArrayList<>();
+
+        // Verifica permissões com base na versão
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (!Environment.isExternalStorageManager()) {
+                requestManageAllFilesAccess();
+                return false;
+            }
+        } else {
+            for (String permission : permissions) {
+                if (ActivityCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                    listPermissionsNeeded.add(permission);
+                }
+            }
+
+            if (!listPermissionsNeeded.isEmpty()) {
+                ActivityCompat.requestPermissions(this, listPermissionsNeeded.toArray(new String[0]), REQUEST_ID_MULTIPLE_PERMISSIONS);
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
@@ -161,6 +228,16 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    private void showRationaleDialog(String title, String message, DialogInterface.OnClickListener onPositiveClick) {
+        new AlertDialog.Builder(this)
+                .setTitle(title)
+                .setMessage(message)
+                .setCancelable(false)
+                .setPositiveButton("TENTAR NOVAMENTE", onPositiveClick)
+                .setNegativeButton("CANCELAR", (dialog, which) -> dialog.dismiss())
+                .show();
+    }
+
     private void exportarDados() {
 
         permissions_granted = checkAndRequestPermissions();
@@ -208,56 +285,6 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    public boolean shouldAskPermission() {
-        return true;
-    }
-
-    private boolean shouldAskPermission(Context context, String permission) {
-        if (shouldAskPermission()) {
-
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
-                return Environment.isExternalStorageManager();
-            } else {
-                int permissionResult = ActivityCompat.checkSelfPermission(context, permission);
-                return permissionResult != PackageManager.PERMISSION_GRANTED;
-            }
-        }
-        return false;
-    }
-
-    private boolean checkAndRequestPermissions() {
-
-        List<String> listPermissionsNeeded = new ArrayList<>();
-
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
-            if(!Environment.isExternalStorageManager()){
-                try {
-                    Intent intent = new Intent();
-                    intent.setAction(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
-                    Uri uri = Uri.fromParts("package", this.getPackageName(), null);
-                    intent.setData(uri);
-                    storageActivityResultLauncher.launch(intent);
-                } catch (Exception ignored) {
-
-                }
-                return false;
-            }
-        } else {
-            for (String permission : permissions) {
-                if (shouldAskPermission(this, permission)) {
-                    listPermissionsNeeded.add(permission);
-                }
-            }
-
-            if (!listPermissionsNeeded.isEmpty()) {
-                ActivityCompat.requestPermissions(this, listPermissionsNeeded.toArray(new String[0]), REQUEST_ID_MULTIPLE_PERMISSIONS);
-                return false;
-            }
-        }
-
-        return true;
-    }
-
     private void goToSettings() {
         Intent intent = new Intent();
         intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
@@ -289,30 +316,6 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                 })
                 .setPositiveButton("Fechar", (dialog, which) -> dialog.dismiss())
                 .show();
-    }
-
-    private void showRational(String title, String msg) {
-        new AlertDialog.Builder(this).setTitle(title).setMessage(msg)
-                .setCancelable(false)
-                .setNegativeButton("TENHO CERTEZA", (dialog, which) -> {
-                    // proceed with logic by disabling the related features or quit the app.
-                    dialog.dismiss();
-                })
-                .setPositiveButton("TENTAR NOVAMENTE", (dialog, which) -> {
-                    checkAndRequestPermissions();
-                    dialog.dismiss();
-                }).show();
-
-    }
-
-    private void dialogForSettings(String title, String msg) {
-        new AlertDialog.Builder(this).setTitle(title).setMessage(msg)
-                .setCancelable(false)
-                .setNegativeButton("AGORA NÂO", (dialog, which) -> dialog.dismiss())
-                .setPositiveButton("DEFINIÇÕES", (dialog, which) -> {
-                    goToSettings();
-                    dialog.dismiss();
-                }).show();
     }
 
     @Override
@@ -356,9 +359,9 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                             String op = temp.split("_")[0];
 
                             if(Objects.equals(op, "WRITE")){
-                                showRational("Permissão escrita negada", "Sem essa permissão, este aplicativo não consegue gravar ficheiros multimédia. Tem certeza de que deseja negar esta permissão.");
+                                showRationaleDialog("Permissão escrita negada", "Sem essa permissão, este aplicativo não consegue gravar ficheiros multimédia. Tem certeza de que deseja cancelar esta permissão.", (dialog, which) -> checkAndRequestPermissions());
                             } else if (Objects.equals(op, "READ")){
-                                showRational("Permissão leitura negada", "Sem essa permissão, este aplicativo não consegue ler ficheiros multimédia. Tem certeza de que deseja negar esta permissão.");
+                                showRationaleDialog("Permissão leitura negada", "Sem essa permissão, este aplicativo não consegue ler ficheiros multimédia. Tem certeza de que deseja cancelar esta permissão.", (dialog, which) -> checkAndRequestPermissions());
                             }
                         }
                         //permission is denied (and never ask again is  checked)
@@ -380,15 +383,15 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    private final ActivityResultLauncher<Intent> storageActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-        // Here we handle the result of our intent
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            if (!Environment.isExternalStorageManager()) {
-                // permission denied
-                showRational("Permissão leitura e escrita negada", "Sem essas permissões, este aplicativo não consegue ler e escrever ficheiros multimédia. Tem certeza de que deseja negar estas permissões.");
-            }
-        }
-    });
+    private void dialogForSettings(String title, String msg) {
+        new AlertDialog.Builder(this).setTitle(title).setMessage(msg)
+                .setCancelable(false)
+                .setNegativeButton("AGORA NÂO", (dialog, which) -> dialog.dismiss())
+                .setPositiveButton("DEFINIÇÕES", (dialog, which) -> {
+                    goToSettings();
+                    dialog.dismiss();
+                }).show();
+    }
 
 
 }

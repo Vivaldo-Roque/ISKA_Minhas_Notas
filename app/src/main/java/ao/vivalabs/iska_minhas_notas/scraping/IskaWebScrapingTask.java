@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import ao.vivalabs.iska_minhas_notas.models.ClassTableModel;
 import ao.vivalabs.iska_minhas_notas.models.HomeModel;
+import ao.vivalabs.iska_minhas_notas.models.TableModel;
 
 public class IskaWebScrapingTask {
 
@@ -111,7 +111,7 @@ public class IskaWebScrapingTask {
                 Element tableHeader = classificacaoTables.select("tr").first();
 
                 // save cells to hasMap
-                List<ClassTableModel> tablesMapList = new ArrayList<>();
+                List<TableModel> tablesMapList = new ArrayList<>();
                 int totalElements = classificacaoTables.size();
                 int id = 0;
                 for (Element table : classificacaoTables.select("tbody")) {
@@ -124,7 +124,7 @@ public class IskaWebScrapingTask {
                             tableMap.put(tableHeader.child(j).text(), tempCols.get(j).text());
                         }
                         id++;
-                        tablesMapList.add(new ClassTableModel(
+                        tablesMapList.add(new TableModel(
                                 id,
                                 tableMap.get("Disciplina"),
                                 tableMap.get("Abrev."),

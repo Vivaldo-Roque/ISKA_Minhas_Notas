@@ -14,7 +14,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import ao.vivalabs.iska_minhas_notas.R;
-import ao.vivalabs.iska_minhas_notas.models.ClassTableModel;
+import ao.vivalabs.iska_minhas_notas.models.TableModel;
 import ao.vivalabs.iska_minhas_notas.scraping.IskaWebScraping;
 
 public class FragmentHome extends Fragment {
@@ -27,6 +27,8 @@ public class FragmentHome extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
         TextView tvNomeEstudante = view.findViewById(R.id.textViewNomeEstudante);
         TextView tvNumeroAluno = view.findViewById(R.id.textViewNumeroAluno);
         TextView tvCurso = view.findViewById(R.id.textViewCurso);
@@ -44,9 +46,9 @@ public class FragmentHome extends Fragment {
         ViewGroup viewGroup = view.<CardView>findViewById(R.id.card_view_dispensadas);
         LinearLayout linearLayoutCadeirasDispensadas = (LinearLayout) viewGroup.getChildAt(0);
 
-        for (ClassTableModel classTableModel : iska.findByResultado("Disp.")) {
+        for (TableModel tableModel : iska.findByResultado("D")) {
             TextView newTextView = new TextView(getContext());
-            newTextView.setText("• ".concat(classTableModel.getDisciplina()));
+            newTextView.setText("• ".concat(tableModel.getDisciplina()));
             newTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.black));
             newTextView.setTextSize(18);
             linearLayoutCadeirasDispensadas.addView(newTextView);
@@ -55,9 +57,9 @@ public class FragmentHome extends Fragment {
         viewGroup = view.<CardView>findViewById(R.id.card_view_exames);
         LinearLayout linearLayoutExames = (LinearLayout) viewGroup.getChildAt(0);
 
-        for (ClassTableModel classTableModel : iska.findByResultado("Exame")) {
+        for (TableModel tableModel : iska.findByResultado("E")) {
             TextView newTextView = new TextView(getContext());
-            newTextView.setText("• ".concat(classTableModel.getDisciplina()));
+            newTextView.setText("• ".concat(tableModel.getDisciplina()));
             newTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.black));
             newTextView.setTextSize(18);
             linearLayoutExames.addView(newTextView);
@@ -66,9 +68,9 @@ public class FragmentHome extends Fragment {
         viewGroup = view.<CardView>findViewById(R.id.card_view_recursos);
         LinearLayout linearLayoutRecursos = (LinearLayout) viewGroup.getChildAt(0);
 
-        for (ClassTableModel classTableModel : iska.findByResultado("Recurso")) {
+        for (TableModel tableModel : iska.findByResultado("R")) {
             TextView newTextView = new TextView(getContext());
-            newTextView.setText("• ".concat(classTableModel.getDisciplina()));
+            newTextView.setText("• ".concat(tableModel.getDisciplina()));
             newTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.black));
             newTextView.setTextSize(18);
             linearLayoutRecursos.addView(newTextView);
@@ -77,9 +79,9 @@ public class FragmentHome extends Fragment {
         viewGroup = view.<CardView>findViewById(R.id.card_view_cadeiras_atraso);
         LinearLayout linearLayoutCadeirasAtraso = (LinearLayout) viewGroup.getChildAt(0);
 
-        for (ClassTableModel classTableModel : iska.findCadeirasAtraso(iska.getTablesMapList())) {
+        for (TableModel tableModel : iska.findCadeirasAtraso(iska.getTablesMapList())) {
             TextView newTextView = new TextView(getContext());
-            newTextView.setText("• ".concat(classTableModel.getDisciplina()));
+            newTextView.setText("• ".concat(tableModel.getDisciplina()));
             newTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.black));
             newTextView.setTextSize(18);
             linearLayoutCadeirasAtraso.addView(newTextView);
@@ -107,6 +109,5 @@ public class FragmentHome extends Fragment {
         tvTelefone.setText(telefone);
         tvTelefone2.setText(telefone2);
         tvEmail.setText(email);
-        super.onViewCreated(view, savedInstanceState);
     }
 }

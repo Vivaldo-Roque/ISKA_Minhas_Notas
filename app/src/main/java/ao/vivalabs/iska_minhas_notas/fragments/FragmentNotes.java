@@ -19,7 +19,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 import ao.vivalabs.iska_minhas_notas.R;
-import ao.vivalabs.iska_minhas_notas.models.ClassTableModel;
+import ao.vivalabs.iska_minhas_notas.models.TableModel;
 import ao.vivalabs.iska_minhas_notas.scraping.IskaWebScraping;
 import ao.vivalabs.iska_minhas_notas.utils.MinMaxFilter;
 
@@ -60,7 +60,7 @@ public class FragmentNotes extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ClassTableModel discipline = IskaWebScraping.getInstance().getDisciplina();
+        TableModel discipline = IskaWebScraping.getInstance().getDisciplina();
 
         tvClassDisciplina = view.findViewById(R.id.tvClassNome);
         tvClassAbreviatura = view.findViewById(R.id.tvClassAbreviatura);

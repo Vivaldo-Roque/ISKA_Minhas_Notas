@@ -6,7 +6,7 @@ import java.text.Collator;
 import java.util.Locale;
 import java.util.Objects;
 
-public class ClassTableModel implements Comparable<ClassTableModel> {
+public class TableModel implements Comparable<TableModel> {
     private final int id;
     private String abreviatura;
     private String ano;
@@ -25,7 +25,7 @@ public class ClassTableModel implements Comparable<ClassTableModel> {
     private String melhoria;
     private int tableId;
 
-    public ClassTableModel(int id, String disciplina, String abreviatura, String ano, String turma, String tipo, String notaFinal, String avaliacaoContinua, String parcelar1, String parcelar2, String finalContinua, String resultado, String exame, String recurso, String epocaEspecial, String melhoria, int tableId) {
+    public TableModel(int id, String disciplina, String abreviatura, String ano, String turma, String tipo, String notaFinal, String avaliacaoContinua, String parcelar1, String parcelar2, String finalContinua, String resultado, String exame, String recurso, String epocaEspecial, String melhoria, int tableId) {
         this.id = id;
         this.disciplina = disciplina;
         this.abreviatura = abreviatura;
@@ -45,7 +45,7 @@ public class ClassTableModel implements Comparable<ClassTableModel> {
         this.tableId = tableId;
     }
 
-    public ClassTableModel(int id, String disciplina) {
+    public TableModel(int id, String disciplina) {
         this.id = id;
         this.disciplina = disciplina;
     }
@@ -124,21 +124,21 @@ public class ClassTableModel implements Comparable<ClassTableModel> {
     }
 
     @Override
-    public int compareTo(ClassTableModel otherClassTableModel) {
+    public int compareTo(TableModel otherTableModel) {
 
         Locale locale = new Locale("pt");
         Collator collator = Collator.getInstance(locale);
 
-        return collator.compare(getDisciplina(), otherClassTableModel.disciplina);
+        return collator.compare(getDisciplina(), otherTableModel.disciplina);
     }
 
     @Override
     public boolean equals(@Nullable Object other) {
         if(this == other)
             return true;
-        if(!(other instanceof ClassTableModel))
+        if (!(other instanceof TableModel))
             return false;
-        ClassTableModel otherPoint= (ClassTableModel) other;
+        TableModel otherPoint = (TableModel) other;
         return Objects.equals(this.disciplina, otherPoint.getDisciplina());
     }
 }

@@ -5,15 +5,15 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
-import ao.vivalabs.iska_minhas_notas.models.ClassTableModel;
 import ao.vivalabs.iska_minhas_notas.models.HomeModel;
+import ao.vivalabs.iska_minhas_notas.models.TableModel;
 
 public class IskaWebScraping {
 
     private static IskaWebScraping instance = null;
-    private List<ClassTableModel> tablesMapList = new ArrayList<>();
+    private List<TableModel> tablesMapList = new ArrayList<>();
     private HomeModel homeModel;
-    private ClassTableModel disciplina = null;
+    private TableModel disciplina = null;
 
     private IskaWebScraping() {
 
@@ -26,11 +26,11 @@ public class IskaWebScraping {
         return instance;
     }
 
-    public ClassTableModel getDisciplina() {
+    public TableModel getDisciplina() {
         return disciplina;
     }
 
-    public void setDisciplina(ClassTableModel disciplina) {
+    public void setDisciplina(TableModel disciplina) {
         this.disciplina = disciplina;
     }
 
@@ -38,10 +38,10 @@ public class IskaWebScraping {
         return this.homeModel;
     }
 
-    public List<ClassTableModel> getTablesMapList() {
+    public List<TableModel> getTablesMapList() {
 
-        List<ClassTableModel> tempPeriod;
-        List<ClassTableModel> res = new ArrayList<>();
+        List<TableModel> tempPeriod;
+        List<TableModel> res = new ArrayList<>();
 
         String[] periods = {"1º Semestre", "2º Semestre", "Anual"};
 
@@ -56,52 +56,60 @@ public class IskaWebScraping {
         return res;
     }
 
-    public void SetIskaWebScraping(HomeModel homeModel, List<ClassTableModel> tablesMapList) {
+    public void SetIskaWebScraping(HomeModel homeModel, List<TableModel> tablesMapList) {
         this.homeModel = homeModel;
         this.tablesMapList = tablesMapList;
     }
 
-    public List<ClassTableModel> findByResultado(String resultado) {
-        List<ClassTableModel> res = new ArrayList<>();
-        String year = getHomeModel().getMatricula().replaceAll("[^0-9]", "");
-        List<ClassTableModel> cadeirasAnoAtual = findAllByYear(year, getTablesMapList());
-        for (ClassTableModel classTableModel : cadeirasAnoAtual) {
-            if (resultado.equals("Recurso")) {
-                if (!classTableModel.getFinalContinua().equals("-")) {
-                    int fCont = Integer.parseInt(classTableModel.getFinalContinua());
+    public List<TableModel> findByResultado(String resultado) {
+        List<TableModel> res = new ArrayList<>();
+        String year = getHomeModel().getMatricula().replaceAll("\\D", "");
+        List<TableModel> cadeirasAnoAtual = findAllByYear(year, getTablesMapList());
+        for (TableModel tableModel : cadeirasAnoAtual) {
+            if (resultado.equals("R")) {
+                if (!tableModel.getFinalContinua().equals("-")) {
+                    int fCont = Integer.parseInt(tableModel.getFinalContinua());
                     if (fCont < 7) {
-                        res.add(classTableModel);
+                        res.add(tableModel);
                     }
                 }
-                if (!classTableModel.getExame().equals("-")) {
-                    int exame = Integer.parseInt(classTableModel.getExame());
+                if (!tableModel.getExame().equals("-")) {
+                    int exame = Integer.parseInt(tableModel.getExame());
                     if (exame < 10) {
-                        res.add(classTableModel);
+                        res.add(tableModel);
                     }
                 }
             }
-            if (classTableModel.getResultado().equals(resultado)) {
-                res.add(classTableModel);
+            if (resultado.equals("D")) {
+                if (tableModel.getResultado().equals("Disp.")) {
+                    res.add(tableModel);
+                    System.out.println(tableModel.getDisciplina());
+                }
+            }
+            if (resultado.equals("E")) {
+                if (tableModel.getResultado().equals("Exame")) {
+                    res.add(tableModel);
+                }
             }
         }
 
         return res;
     }
 
-    public List<ClassTableModel> findCadeirasAtraso(List<ClassTableModel> classTableModelList) {
-        List<ClassTableModel> res = new ArrayList<>();
+    public List<TableModel> findCadeirasAtraso(List<TableModel> tableModelList) {
+        List<TableModel> res = new ArrayList<>();
         // int currentYear = Integer.parseInt(getHomeModel().getMatricula().replaceAll("[^0-9]", ""));
-        for (ClassTableModel classTableModel : classTableModelList) {
-            int year = classTableModel.getTableId();
-            int tempYear = Integer.parseInt(classTableModel.getAno().replaceAll("[^0-9]", ""));
+        for (TableModel tableModel : tableModelList) {
+            int year = tableModel.getTableId();
+            int tempYear = Integer.parseInt(tableModel.getAno().replaceAll("\\D", ""));
 
             if (tempYear != year) {
-                if (classTableModel.todosCamposVazios()) {
-                    res.add(classTableModel);
-                } else if (!classTableModel.getNotaFinal().equals("-")) {
-                    int nota = Integer.parseInt(classTableModel.getNotaFinal());
+                if (tableModel.todosCamposVazios()) {
+                    res.add(tableModel);
+                } else if (!tableModel.getNotaFinal().equals("-")) {
+                    int nota = Integer.parseInt(tableModel.getNotaFinal());
                     if (nota < 10) {
-                        res.add(classTableModel);
+                        res.add(tableModel);
                     }
                 }
             }
@@ -110,12 +118,12 @@ public class IskaWebScraping {
         return res;
     }
 
-    public String[] findAllYears(List<ClassTableModel> classTableModels) {
+    public String[] findAllYears(List<TableModel> tableModels) {
 
         HashSet<String> temp = new HashSet<>();
 
-        for (ClassTableModel classTableModel : classTableModels) {
-            temp.add(classTableModel.getAno());
+        for (TableModel tableModel : tableModels) {
+            temp.add(tableModel.getAno());
         }
 
         ArrayList<String> res = new ArrayList<>(temp);
@@ -125,50 +133,54 @@ public class IskaWebScraping {
         return res.toArray(new String[0]);
     }
 
-    public List<ClassTableModel> findAllByYear(String year, List<ClassTableModel> classTableModels) {
+    public List<TableModel> findAllByYear(String year, List<TableModel> tableModels) {
 
-        List<ClassTableModel> res = new ArrayList<>();
+        List<TableModel> res = new ArrayList<>();
 
-        for (ClassTableModel classTableModel : classTableModels) {
-            if (classTableModel.getAno().equals(year)) {
-                res.add(classTableModel);
+        for (TableModel tableModel : tableModels) {
+            try {
+                int ano0 = Integer.parseInt(tableModel.getAno().replaceAll("\\D", ""));
+                int ano1 = Integer.parseInt(year.replaceAll("\\D", ""));
+                if (ano0 == ano1) {
+                    res.add(tableModel);
+                }
+            } catch (NumberFormatException ex) { // handle your exception
             }
         }
 
         Collections.sort(res);
-
         return res;
     }
 
-    public List<ClassTableModel> findAllByPeriod(String period, List<ClassTableModel> classTableModels) {
+    public List<TableModel> findAllByPeriod(String period, List<TableModel> tableModels) {
 
-        List<ClassTableModel> res = new ArrayList<>();
+        List<TableModel> res = new ArrayList<>();
 
-        for (ClassTableModel classTableModel : classTableModels) {
-            if (classTableModel.getTipo().equals(period)) {
-                res.add(classTableModel);
+        for (TableModel tableModel : tableModels) {
+            if (tableModel.getTipo().equals(period)) {
+                res.add(tableModel);
             }
         }
 
         return res;
     }
 
-    public ClassTableModel findByDiscipline(String discipline, List<ClassTableModel> classTableModels) {
+    public TableModel findByDiscipline(String discipline, List<TableModel> tableModels) {
 
-        for (ClassTableModel classTableModel : classTableModels) {
-            if (classTableModel.getDisciplina().equals(discipline)) {
-                return classTableModel;
+        for (TableModel tableModel : tableModels) {
+            if (tableModel.getDisciplina().equals(discipline)) {
+                return tableModel;
             }
         }
 
         return null;
     }
 
-    public ClassTableModel findById(int id, List<ClassTableModel> classTableModels) {
+    public TableModel findById(int id, List<TableModel> tableModels) {
 
-        for (ClassTableModel classTableModel : classTableModels) {
-            if (classTableModel.getId() == id) {
-                return classTableModel;
+        for (TableModel tableModel : tableModels) {
+            if (tableModel.getId() == id) {
+                return tableModel;
             }
         }
 
